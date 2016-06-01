@@ -30,3 +30,13 @@
 
 # Debug files
 *.dSYM/
+
+# Eclipse
+.metadata
+.project
+.cproject
+RemoteSystemsTempFiles
+
+# Other
+.env.local
+
