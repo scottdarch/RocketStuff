@@ -28,31 +28,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#pragma once
 
-#include <util/delay.h>
-#include <assert.h>
-#include "board.h"
-#include "Context.h"
-#include "Shift8.h"
-#include "Led.h"
+typedef enum {
+    DRIVERTYPE_SHIFTREG_8 = 0,
+    DRIVERTYPE_LED_0 = 1,
+    DRIVERTYPE_MAX = 2,
 
-Context g_app_context;
+} DriverType;
 
-extern Context *init_context(Context *self);
+struct Context_t;
 
-int main(void)
-{
-    init_context(&g_app_context);
-    init_board(&g_app_context);
-    Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVERTYPE_SHIFTREG_8);
-    assert(shift);
-    Led *led = g_app_context.get_driver(&g_app_context, DRIVERTYPE_LED_0);
-    assert(led);
-    shift->shift_out(shift, MSBFIRST, 0xFF);
-    while (1) {
-        led->turn_on(led);
-        _delay_ms(500);
-        led->turn_off(led);
-        _delay_ms(500);
-    }
-}
+typedef void *(*get_driver_func)(struct Context_t *self, DriverType type);
+
+typedef struct Context_t {
+    get_driver_func get_driver;
+    void *_drivers[2];
+} Context;

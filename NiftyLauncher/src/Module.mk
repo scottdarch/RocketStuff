@@ -31,8 +31,12 @@
 LOCAL_MODULE_NAME := $(PROJECT_NAME)
 
 LOCAL_INCLUDES += $(LOCAL_DIR) \
+                  $(LOCAL_DIR)/$(BOARD) \
 
-LOCAL_SRC_C     += $(wildcard $(LOCAL_DIR)/*.c) \
-
+LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \
+                   $(LOCAL_DIR)/Context.c \
+                   $(LOCAL_DIR)/$(BOARD)/Shift8.c \
+                   $(LOCAL_DIR)/$(BOARD)/Led.c \
+                   $(LOCAL_DIR)/$(BOARD)/board.c \
 
 include $(COMMAND_MAKE_BINARY)

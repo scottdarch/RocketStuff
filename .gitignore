@@ -36,7 +36,9 @@
 .project
 .cproject
 RemoteSystemsTempFiles
+.settings
 
 # Other
 .env.local
+.build
 

@@ -50,7 +50,8 @@ DEPFLAGS         = -MT $@ -MMD -MP -MF "$(patsubst %.o,%.Td,$@)"
 POSTCOMPILE      = mv -f $(patsubst %.o,%.Td,$@) $(patsubst %.o,%.d,$@)
 
 CFLAGS          +=  \
-                    -std=gnu99 \
+                    -mmcu=$(BOARD_MCU) \
+                    -std=c99 \
                     -Wall \
                     -Werror \
                     -ffunction-sections \
@@ -93,9 +94,10 @@ GCCHEADERS      := $(GCCPREFIX)/$(BOARD_MCU_ARCH)/include
 # +----------------------------------------------------------------------------+
 # | AVR TOOLS
 # +----------------------------------------------------------------------------+
-TOOL_PROGRAM          = avrdude -p $(BOARD_MCU) $(1)
+TOOL_PROGRAM          = avrdude -p $(BOARD_MCU) -c dragon_isp $(1)
 TOOL_DBGSVR           = avarice -g -w -P $(BOARD_MCU) :4242
-TOOL_BINSIZE          = $(BOARD_GCC_PREFIX)size --mcu=$(BOARD_MCU) --format=avr --target=binary $(1)
+TOOL_BINSIZE          = $(BOARD_GCC_PREFIX)size --mcu=$(BOARD_MCU) --format=avr $(1)
+TOOL_OBJDUMP          = $(BOARD_GCC_PREFIX)objdump -d $(1)
 
 # +----------------------------------------------------------------------------+
 # | TARGETS
@@ -106,7 +108,7 @@ GLOBAL_PHONIES += $(strip $(1))-size $(strip $(1))-flash $(strip $(1))-flash-fus
 GLOBAL_INCLUDE_PATHS += $(sort $(3))
 GLOBAL_GOALS += $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
 
-$(strip $(1))-size: $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
+$(strip $(1))-size: $$(addprefix $$(BUILD_FOLDER)/,$(1).elf)
 	$$(call TOOL_BINSIZE, $$<)
 
 $(strip $(1))-flash: $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
@@ -114,6 +116,9 @@ $(strip $(1))-flash: $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
 
 $(strip $(1))-flash-fuse: 
 	$$(call TOOL_PROGRAM, $$(BOARD_PROGRAM_FUSE))
+
+$(strip $(1))-cat: $$(addprefix $$(BUILD_FOLDER)/,$(1).elf)
+	$$(call TOOL_OBJDUMP, $$<)
 
 $(strip $(1))-debug-server:
 	$$(call TOOL_DBGSVR)
@@ -128,12 +133,12 @@ $$(addprefix $$(BUILD_FOLDER)/,$(1).elf) : $(2)
 
 $$(BUILD_FOLDER)/%.o : %.s $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(BOARD_GCC_PREFIX)as $$(DEPFLAGS) $$(ASFLAGS) -D__ASSEMBLY__ -c $$< -o $$@
+	$$(BOARD_GCC_PREFIX)as $$(DEPFLAGS) $$(ASFLAGS) -Iinclude $(addprefix -I,$(sort $(3))) -D__ASSEMBLY__ -c $$< -o $$@
 	$$(POSTCOMPILE)
 
 $$(BUILD_FOLDER)/%.o : %.c $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(BOARD_GCC_PREFIX)gcc $$(DEPFLAGS) $$(CFLAGS) $(addprefix -I,$(sort $(3))) -c $$< -o $$@
+	$$(BOARD_GCC_PREFIX)gcc $$(DEPFLAGS) $$(CFLAGS) -Iinclude $(addprefix -I,$(sort $(3))) -c $$< -o $$@
 	$$(POSTCOMPILE)
 
 endef

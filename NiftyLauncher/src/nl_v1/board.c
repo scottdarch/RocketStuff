@@ -28,31 +28,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-#include <util/delay.h>
 #include <assert.h>
 #include "board.h"
 #include "Context.h"
 #include "Shift8.h"
 #include "Led.h"
 
-Context g_app_context;
+extern Shift8 *init_shift8(Shift8 *self, Context *app_context);
+extern Led *init_led(Led *self, Context *app_context, volatile uint8_t *ddr, volatile uint8_t *port,
+                     uint8_t pin);
 
-extern Context *init_context(Context *self);
+static Shift8 g_shift8;
+static Led g_led0;
 
-int main(void)
+void init_board(Context *app_context)
 {
-    init_context(&g_app_context);
-    init_board(&g_app_context);
-    Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVERTYPE_SHIFTREG_8);
-    assert(shift);
-    Led *led = g_app_context.get_driver(&g_app_context, DRIVERTYPE_LED_0);
-    assert(led);
-    shift->shift_out(shift, MSBFIRST, 0xFF);
-    while (1) {
-        led->turn_on(led);
-        _delay_ms(500);
-        led->turn_off(led);
-        _delay_ms(500);
-    }
+    assert(app_context);
+    app_context->_drivers[DRIVERTYPE_SHIFTREG_8] = init_shift8(&g_shift8, app_context);
+    app_context->_drivers[DRIVERTYPE_LED_0] = init_led(&g_led0, app_context, &DDRA, &PORTA, PA0);
 }

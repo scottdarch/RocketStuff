@@ -28,31 +28,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#pragma once
+#include <stdint.h>
 
-#include <util/delay.h>
-#include <assert.h>
-#include "board.h"
-#include "Context.h"
-#include "Shift8.h"
-#include "Led.h"
+struct Context_t;
+struct Led_t;
 
-Context g_app_context;
+typedef void (*led_func)(struct Led_t *self);
 
-extern Context *init_context(Context *self);
-
-int main(void)
-{
-    init_context(&g_app_context);
-    init_board(&g_app_context);
-    Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVERTYPE_SHIFTREG_8);
-    assert(shift);
-    Led *led = g_app_context.get_driver(&g_app_context, DRIVERTYPE_LED_0);
-    assert(led);
-    shift->shift_out(shift, MSBFIRST, 0xFF);
-    while (1) {
-        led->turn_on(led);
-        _delay_ms(500);
-        led->turn_off(led);
-        _delay_ms(500);
-    }
-}
+typedef struct Led_t {
+    struct Context_t *app_context;
+    volatile uint8_t *port;
+    uint8_t pin;
+    led_func turn_on;
+    led_func turn_off;
+} Led;
