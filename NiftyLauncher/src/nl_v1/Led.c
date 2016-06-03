@@ -31,26 +31,11 @@
 #include "Led.h"
 #include "Context.h"
 
-static void _turn_off(Led *self)
-{
-    *(self->port) &= ~(1 << self->pin);
-}
-
-static void _turn_on(Led *self)
-{
-    *(self->port) |= (1 << self->pin);
-}
-
-Led *init_led(Led *self, Context *app_context, volatile uint8_t *ddr, volatile uint8_t *port,
-              uint8_t pin)
+Led *init_led(Led *self, Context *app_context, GPOut io)
 {
     if (self) {
         self->app_context = app_context;
-        *ddr |= (1 << pin);
-        self->port = port;
-        self->pin = pin;
-        self->turn_off = _turn_off;
-        self->turn_on = _turn_on;
+        self->_io = io;
     }
     return self;
 }

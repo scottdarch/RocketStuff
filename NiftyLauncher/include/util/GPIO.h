@@ -28,46 +28,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include <assert.h>
-#include "Shift8.h"
-#include "Context.h"
-#include "util/atomic.h"
+#pragma once
 
-static void _shift_out(struct Shift8_t *self, uint8_t bit_order, uint8_t value)
-{
+typedef struct GPIn_t {
+    volatile uint8_t *port;
+    uint8_t pin;
+} GPIn;
 
-    assert(self);
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        GPOUT_OFF(self, str_clock);
+typedef struct GPOut_t {
+    volatile uint8_t *port;
+    uint8_t pout;
+} GPOut;
 
-        uint8_t i;
-
-        for (i = 0; i < 8; ++i) {
-            if (bit_order == LSBFIRST) {
-                GPOUT_WRITE(self, ds, !!(value & (1 << i)));
-            } else {
-                GPOUT_WRITE(self, ds, !!(value & (1 << (7 - i))));
-            }
-            GPOUT_ON(self, shr_clock);
-            GPOUT_OFF(self, shr_clock);
-        }
-
-        GPOUT_ON(self, str_clock);
-    }
-}
-
-Shift8 *init_shift8(Shift8 *self, Context *app_context, GPOut data_serial, GPOut str_clock,
-                    GPOut shr_clock)
-{
-    if (self) {
-        assert(app_context);
-        self->app_context = app_context;
-        self->shift_out = _shift_out;
-        self->_ds = data_serial;
-        self->_str_clock = str_clock;
-        self->_shr_clock = shr_clock;
-        GPOUT_ON(self, str_clock);
-    }
-    return self;
-}
+#define GPOUT_ON(PTR, GPOUT) *(PTR->_##GPOUT.port) |= (1 << PTR->_##GPOUT.pout)
+#define GPOUT_OFF(PTR, GPOUT) *(PTR->_##GPOUT.port) &= ~(1 << PTR->_##GPOUT.pout)
+#define GPOUT_WRITE(PTR, GPOUT, VALUE)                                                             \
+    *(PTR->_##GPOUT.port) = (VALUE) ? (*(PTR->_##GPOUT.port) | (1 << PTR->_##GPOUT.pout))          \
+                                    : (*(PTR->_##GPOUT.port) & ~(1 << PTR->_##GPOUT.pout))

@@ -34,9 +34,9 @@
 #include "Shift8.h"
 #include "Led.h"
 
-extern Shift8 *init_shift8(Shift8 *self, Context *app_context);
-extern Led *init_led(Led *self, Context *app_context, volatile uint8_t *ddr, volatile uint8_t *port,
-                     uint8_t pin);
+extern Shift8 *init_shift8(Shift8 *self, Context *app_context, GPOut data_serial, GPOut str_clock,
+                           GPOut shr_clock);
+extern Led *init_led(Led *self, Context *app_context, GPOut io);
 
 static Shift8 g_shift8;
 static Led g_led0;
@@ -44,6 +44,11 @@ static Led g_led0;
 void init_board(Context *app_context)
 {
     assert(app_context);
-    app_context->_drivers[DRIVERTYPE_SHIFTREG_8] = init_shift8(&g_shift8, app_context);
-    app_context->_drivers[DRIVERTYPE_LED_0] = init_led(&g_led0, app_context, &DDRA, &PORTA, PA0);
+
+    DDRA |= (1 << DDA0) | (1 << DDA1) | (1 << DDA2) | (1 << DDA3);
+
+    app_context->_drivers[DRIVERTYPE_SHIFTREG_8] = init_shift8(
+        &g_shift8, app_context, (GPOut){&PORTA, PA1}, (GPOut){&PORTA, PA2}, (GPOut){&PORTA, PA3});
+
+    app_context->_drivers[DRIVERTYPE_LED_0] = init_led(&g_led0, app_context, (GPOut){&PORTA, PA0});
 }

@@ -30,16 +30,12 @@
  */
 #pragma once
 #include <stdint.h>
+#include "util/GPIO.h"
 
 struct Context_t;
 struct Led_t;
 
-typedef void (*led_func)(struct Led_t *self);
-
 typedef struct Led_t {
     struct Context_t *app_context;
-    volatile uint8_t *port;
-    uint8_t pin;
-    led_func turn_on;
-    led_func turn_off;
+    GPOut _io;
 } Led;

@@ -46,13 +46,15 @@ int main(void)
     init_board(&g_app_context);
     Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVERTYPE_SHIFTREG_8);
     assert(shift);
+    uint8_t number_to_display = 0;
     Led *led = g_app_context.get_driver(&g_app_context, DRIVERTYPE_LED_0);
     assert(led);
-    shift->shift_out(shift, MSBFIRST, 0xFF);
     while (1) {
-        led->turn_on(led);
+        number_to_display = (number_to_display == 255) ? 0 : number_to_display + 1;
+        GPOUT_ON(led, io);
+        shift->shift_out(shift, MSBFIRST, number_to_display);
         _delay_ms(500);
-        led->turn_off(led);
+        GPOUT_OFF(led, io);
         _delay_ms(500);
     }
 }

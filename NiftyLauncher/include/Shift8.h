@@ -30,6 +30,7 @@
  */
 #pragma once
 #include <stdint.h>
+#include "util/GPIO.h"
 
 #define LSBFIRST 0
 #define MSBFIRST 1
@@ -42,4 +43,7 @@ typedef void (*shift_out_func)(struct Shift8_t *self, uint8_t bit_order, uint8_t
 typedef struct Shift8_t {
     struct Context_t *app_context;
     shift_out_func shift_out;
+    GPOut _ds;
+    GPOut _str_clock;
+    GPOut _shr_clock;
 } Shift8;
