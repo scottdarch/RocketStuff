@@ -28,22 +28,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include "Button.h"
+#include "Context.h"
 
-typedef enum {
-    DRIVER_SHIFTREG_8 = 0,
-    DRIVER_LED_0 = 1,
-    DRIVER_BUTTON_LAUNCH = 2,
-    DRIVER_TIMER0 = 3,
-    DRIVER_MAX = 4,
+void _drive_button(Button *self)
+{
+    self->_button_state = (self->_button_state << 1) | !GPIN_READ(self, io);
+    if (self->_button_state == 0xFF && !self->_button_is_down) {
+        self->_button_is_down = 1;
+        if (self->callback) {
+            self->callback(self);
+        }
+    } else if (self->_button_state == 0x00 && self->_button_is_down) {
+        self->_button_is_down = 0;
+    }
+}
 
-} Driver;
-
-struct Context_t;
-
-typedef void *(*get_driver_func)(struct Context_t *self, Driver type);
-
-typedef struct Context_t {
-    get_driver_func get_driver;
-    void *_drivers[4];
-} Context;
+Button *init_button(Button *button, Context *app_context, GPIn io)
+{
+    if (button) {
+        button->callback = 0;
+        button->drive = _drive_button;
+        button->_io = io;
+        button->_button_state = 0;
+        button->_button_is_down = 0;
+    }
+    return button;
+}

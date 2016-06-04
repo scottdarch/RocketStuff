@@ -33,22 +33,38 @@
 #include "Context.h"
 #include "Shift8.h"
 #include "Led.h"
+#include "Button.h"
+#include "Timer.h"
 
 extern Shift8 *init_shift8(Shift8 *self, Context *app_context, GPOut data_serial, GPOut str_clock,
                            GPOut shr_clock);
 extern Led *init_led(Led *self, Context *app_context, GPOut io);
 
+extern Button *init_button(Button *button, Context *app_context, GPIn io);
+
+extern Timer *init_timer(Timer *timer, Context *app_context);
+
 static Shift8 g_shift8;
 static Led g_led0;
+static Button g_launch_button;
+static Timer g_timer;
 
 void init_board(Context *app_context)
 {
     assert(app_context);
 
     DDRA |= (1 << DDA0) | (1 << DDA1) | (1 << DDA2) | (1 << DDA3);
+    DDRB = 0;
 
-    app_context->_drivers[DRIVERTYPE_SHIFTREG_8] = init_shift8(
+    app_context->_drivers[DRIVER_SHIFTREG_8] = init_shift8(
         &g_shift8, app_context, (GPOut){&PORTA, PA1}, (GPOut){&PORTA, PA2}, (GPOut){&PORTA, PA3});
 
-    app_context->_drivers[DRIVERTYPE_LED_0] = init_led(&g_led0, app_context, (GPOut){&PORTA, PA0});
+    app_context->_drivers[DRIVER_LED_0] = init_led(&g_led0, app_context, (GPOut){&PORTA, PA0});
+
+    // enable pullup
+    PORTB |= (1 << PB2);
+    app_context->_drivers[DRIVER_BUTTON_LAUNCH] =
+        init_button(&g_launch_button, app_context, (GPIn){&PINB, PINB2});
+
+    app_context->_drivers[DRIVER_TIMER0] = init_timer(&g_timer, app_context);
 }

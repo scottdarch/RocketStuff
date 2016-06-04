@@ -35,8 +35,10 @@ LOCAL_INCLUDES += $(LOCAL_DIR) \
 
 LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \
                    $(LOCAL_DIR)/Context.c \
-                   $(LOCAL_DIR)/$(BOARD)/Shift8.c \
-                   $(LOCAL_DIR)/$(BOARD)/Led.c \
+                   $(LOCAL_DIR)/Shift8.c \
+                   $(LOCAL_DIR)/Led.c \
+                   $(LOCAL_DIR)/Button.c \
+                   $(LOCAL_DIR)/Timer.c \
                    $(LOCAL_DIR)/$(BOARD)/board.c \
 
 include $(COMMAND_MAKE_BINARY)

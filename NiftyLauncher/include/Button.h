@@ -29,21 +29,19 @@
  * SOFTWARE.
  */
 #pragma once
+#include <stdint.h>
+#include "util/GPIO.h"
 
-typedef enum {
-    DRIVER_SHIFTREG_8 = 0,
-    DRIVER_LED_0 = 1,
-    DRIVER_BUTTON_LAUNCH = 2,
-    DRIVER_TIMER0 = 3,
-    DRIVER_MAX = 4,
+struct Button_t;
 
-} Driver;
+typedef void (*on_button_press)(struct Button_t *button);
+typedef void (*button_func)(struct Button_t *self);
 
-struct Context_t;
+typedef struct Button_t {
+    on_button_press callback;
+    button_func drive;
+    GPIn _io;
+    uint8_t _button_state;
+    uint8_t _button_is_down;
 
-typedef void *(*get_driver_func)(struct Context_t *self, Driver type);
-
-typedef struct Context_t {
-    get_driver_func get_driver;
-    void *_drivers[4];
-} Context;
+} Button;

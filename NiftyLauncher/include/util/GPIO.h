@@ -29,6 +29,7 @@
  * SOFTWARE.
  */
 #pragma once
+#include <stdint.h>
 
 typedef struct GPIn_t {
     volatile uint8_t *port;
@@ -45,3 +46,5 @@ typedef struct GPOut_t {
 #define GPOUT_WRITE(PTR, GPOUT, VALUE)                                                             \
     *(PTR->_##GPOUT.port) = (VALUE) ? (*(PTR->_##GPOUT.port) | (1 << PTR->_##GPOUT.pout))          \
                                     : (*(PTR->_##GPOUT.port) & ~(1 << PTR->_##GPOUT.pout))
+
+#define GPIN_READ(PTR, GPIN) (*(PTR->_##GPIN.port) & (1 << PTR->_##GPIN.pin)) ? 1 : 0

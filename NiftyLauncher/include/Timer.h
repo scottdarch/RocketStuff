@@ -29,21 +29,17 @@
  * SOFTWARE.
  */
 #pragma once
+struct Timer_t;
 
-typedef enum {
-    DRIVER_SHIFTREG_8 = 0,
-    DRIVER_LED_0 = 1,
-    DRIVER_BUTTON_LAUNCH = 2,
-    DRIVER_TIMER0 = 3,
-    DRIVER_MAX = 4,
+typedef void (*timer_callback_func)(volatile struct Timer_t *timer, void *userdata);
 
-} Driver;
+typedef struct _TimerReg_t {
+    timer_callback_func callback;
+    void *userdata;
+} _TimerReg;
 
-struct Context_t;
-
-typedef void *(*get_driver_func)(struct Context_t *self, Driver type);
-
-typedef struct Context_t {
-    get_driver_func get_driver;
-    void *_drivers[4];
-} Context;
+typedef struct Timer_t {
+    void (*add_timer)(struct Timer_t *self, timer_callback_func callback, void *userdata);
+    void (*_isr)(volatile struct Timer_t *self);
+    _TimerReg _timers[1];
+} Timer;

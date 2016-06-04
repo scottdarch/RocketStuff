@@ -39,10 +39,12 @@ struct Shift8_t;
 struct Context_t;
 
 typedef void (*shift_out_func)(struct Shift8_t *self, uint8_t bit_order, uint8_t value);
+typedef void (*shift_reset_func)(struct Shift8_t *self);
 
 typedef struct Shift8_t {
     struct Context_t *app_context;
     shift_out_func shift_out;
+    shift_reset_func reset;
     GPOut _ds;
     GPOut _str_clock;
     GPOut _shr_clock;

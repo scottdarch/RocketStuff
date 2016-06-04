@@ -56,7 +56,6 @@ CFLAGS          +=  \
                     -Werror \
                     -ffunction-sections \
                     -fdata-sections \
-                    -fno-strict-aliasing \
                     -Dprintf=iprintf \
                     -Dscanf=iscanf \
                     -DF_CPU=$(BOARD_MCU_CLK) \
@@ -129,7 +128,7 @@ $$(addprefix $$(BUILD_FOLDER)/,$(1).hex) : $$(addprefix $$(BUILD_FOLDER)/,$(1).e
 
 $$(addprefix $$(BUILD_FOLDER)/,$(1).elf) : $(2)
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(BOARD_GCC_PREFIX)gcc $$(LDFLAGS) -o $$@ $$^
+	$$(BOARD_GCC_PREFIX)gcc $$(CFLAGS) $$(LDFLAGS) -o $$@ $$^
 
 $$(BUILD_FOLDER)/%.o : %.s $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)

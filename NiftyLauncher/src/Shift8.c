@@ -57,6 +57,12 @@ static void _shift_out(struct Shift8_t *self, uint8_t bit_order, uint8_t value)
     }
 }
 
+static void _shift_reset(Shift8 *self)
+{
+    GPOUT_OFF(self, str_clock);
+    GPOUT_ON(self, str_clock);
+}
+
 Shift8 *init_shift8(Shift8 *self, Context *app_context, GPOut data_serial, GPOut str_clock,
                     GPOut shr_clock)
 {
@@ -64,6 +70,7 @@ Shift8 *init_shift8(Shift8 *self, Context *app_context, GPOut data_serial, GPOut
         assert(app_context);
         self->app_context = app_context;
         self->shift_out = _shift_out;
+        self->reset = _shift_reset;
         self->_ds = data_serial;
         self->_str_clock = str_clock;
         self->_shr_clock = shr_clock;

@@ -30,31 +30,68 @@
  */
 
 #include <util/delay.h>
-#include <assert.h>
+#include <avr/interrupt.h>
 #include "board.h"
 #include "Context.h"
 #include "Shift8.h"
 #include "Led.h"
+#include "Button.h"
+#include "Timer.h"
 
+typedef enum {
+    LAUNCHER_STATE_DISARMED,
+    LAUNCHER_STATE_ARMED,
+    LAUNCHER_STATE_COUNTDOWN,
+    LAUNCHER_STATE_FIRING
+} LauncherState;
+
+LauncherState g_launcher_state = LAUNCHER_STATE_DISARMED;
 Context g_app_context;
 
 extern Context *init_context(Context *self);
 
+void on_launch_button(Button *button)
+{
+    if (LAUNCHER_STATE_DISARMED == g_launcher_state) {
+        g_launcher_state = LAUNCHER_STATE_COUNTDOWN;
+    } else {
+        g_launcher_state = LAUNCHER_STATE_DISARMED;
+    }
+}
+
+void button_driver(volatile Timer *timer, void *user_data)
+{
+    Button *b = (Button *)user_data;
+    b->drive(b);
+}
+
 int main(void)
 {
+    cli();
     init_context(&g_app_context);
     init_board(&g_app_context);
-    Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVERTYPE_SHIFTREG_8);
-    assert(shift);
+    Shift8 *shift = g_app_context.get_driver(&g_app_context, DRIVER_SHIFTREG_8);
     uint8_t number_to_display = 0;
-    Led *led = g_app_context.get_driver(&g_app_context, DRIVERTYPE_LED_0);
-    assert(led);
+    Led *led = g_app_context.get_driver(&g_app_context, DRIVER_LED_0);
+    Button *launch_button = g_app_context.get_driver(&g_app_context, DRIVER_BUTTON_LAUNCH);
+    launch_button->callback = on_launch_button;
+    Timer *timer0 __attribute__((unused)) = g_app_context.get_driver(&g_app_context, DRIVER_TIMER0);
+    timer0->add_timer(timer0, button_driver, launch_button);
     while (1) {
-        number_to_display = (number_to_display == 255) ? 0 : number_to_display + 1;
-        GPOUT_ON(led, io);
-        shift->shift_out(shift, MSBFIRST, number_to_display);
+        launch_button->drive(launch_button);
+        if (LAUNCHER_STATE_COUNTDOWN == g_launcher_state) {
+            number_to_display = (number_to_display == 255) ? 0 : number_to_display + 1;
+            GPOUT_ON(led, io);
+            shift->shift_out(shift, MSBFIRST, number_to_display);
+            sei();
+            _delay_ms(500);
+            cli();
+            GPOUT_OFF(led, io);
+        } else {
+            GPOUT_OFF(led, io);
+        }
+        sei();
         _delay_ms(500);
-        GPOUT_OFF(led, io);
-        _delay_ms(500);
+        cli();
     }
 }

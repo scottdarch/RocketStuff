@@ -32,10 +32,10 @@
 #include "Context.h"
 #include "assert.h"
 
-static void *_get_driver(Context *self, DriverType type)
+static void *_get_driver(Context *self, Driver type)
 {
     assert(self);
-    assert(type < DRIVERTYPE_MAX);
+    assert(type < DRIVER_MAX);
     return self->_drivers[type];
 }
 

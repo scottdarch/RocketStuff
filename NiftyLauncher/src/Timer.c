@@ -28,22 +28,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/atomic.h>
+#include "Timer.h"
+#include "Context.h"
 
-typedef enum {
-    DRIVER_SHIFTREG_8 = 0,
-    DRIVER_LED_0 = 1,
-    DRIVER_BUTTON_LAUNCH = 2,
-    DRIVER_TIMER0 = 3,
-    DRIVER_MAX = 4,
+// THIS IS ALL CRAP CODE. DO NOT C&P!
 
-} Driver;
+volatile Timer *g_timers[1] = {0};
 
-struct Context_t;
+ISR(TIM0_OVF_vect)
+{
+    volatile Timer *t = g_timers[0];
+    if (t) {
+        t->_isr(t);
+    }
+}
 
-typedef void *(*get_driver_func)(struct Context_t *self, Driver type);
+static void _add_timer(Timer *self, timer_callback_func callback, void *userdata)
+{
+    self->_timers[0].callback = callback;
+    self->_timers[0].userdata = userdata;
+}
 
-typedef struct Context_t {
-    get_driver_func get_driver;
-    void *_drivers[4];
-} Context;
+static void _isr(volatile Timer *self)
+{
+    _TimerReg r = self->_timers[0];
+    if (r.callback) {
+        r.callback(self, r.userdata);
+    }
+}
+
+Timer *init_timer(Timer *timer, Context *app_context)
+{
+    if (timer) {
+        timer->add_timer = _add_timer;
+        timer->_isr = _isr;
+        timer->_timers[0].callback = 0;
+        TIMSK0 |= (1 << TOIE0);
+        TCCR0A = 0;
+        TCCR0B = (1 << CS00);
+        g_timers[0] = timer;
+    }
+    return timer;
+}
