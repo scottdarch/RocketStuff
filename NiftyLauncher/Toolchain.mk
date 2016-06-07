@@ -94,6 +94,7 @@ GCCHEADERS      := $(GCCPREFIX)/$(BOARD_MCU_ARCH)/include
 # | AVR TOOLS
 # +----------------------------------------------------------------------------+
 TOOL_PROGRAM          = avrdude -p $(BOARD_MCU) -c dragon_isp $(1)
+TOOL_BOARD_TERM       = avrdude -p $(BOARD_MCU) -c dragon_isp -t
 TOOL_DBGSVR           = avarice -g -w -P $(BOARD_MCU) :4242
 TOOL_BINSIZE          = $(BOARD_GCC_PREFIX)size --mcu=$(BOARD_MCU) --format=avr $(1)
 TOOL_OBJDUMP          = $(BOARD_GCC_PREFIX)objdump -d $(1)
@@ -103,7 +104,14 @@ TOOL_OBJDUMP          = $(BOARD_GCC_PREFIX)objdump -d $(1)
 # +----------------------------------------------------------------------------+
 define generate_binary_recipes
 
-GLOBAL_PHONIES += $(strip $(1))-size $(strip $(1))-flash $(strip $(1))-flash-fuse $(strip $(1))-debug-server
+GLOBAL_PHONIES += $(strip $(1))-size \
+                  $(strip $(1))-cat \
+                  $(strip $(1))-board \
+                  $(strip $(1))-flash \
+                  $(strip $(1))-flash-fuse-nl-v1 \
+                  $(strip $(1))-flash-fuse-default \
+                  $(strip $(1))-debug-server \
+
 GLOBAL_INCLUDE_PATHS += $(sort $(3))
 GLOBAL_GOALS += $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
 
@@ -113,8 +121,14 @@ $(strip $(1))-size: $$(addprefix $$(BUILD_FOLDER)/,$(1).elf)
 $(strip $(1))-flash: $$(addprefix $$(BUILD_FOLDER)/,$(1).hex)
 	$$(call TOOL_PROGRAM, $$(BOARD_PROGRAM_FIRMWARE))
 
-$(strip $(1))-flash-fuse: 
-	$$(call TOOL_PROGRAM, $$(BOARD_PROGRAM_FUSE))
+$(strip $(1))-board:
+	$$(call TOOL_BOARD_TERM)
+
+$(strip $(1))-flash-fuse-nl-v1: 
+	$$(call TOOL_PROGRAM, $$(BOARD_PROGRAM_FUSE_NL_V1))
+
+$(strip $(1))-flash-fuse-default: 
+	$$(call TOOL_PROGRAM, $$(BOARD_PROGRAM_FUSE_DEFAULT))
 
 $(strip $(1))-cat: $$(addprefix $$(BUILD_FOLDER)/,$(1).elf)
 	$$(call TOOL_OBJDUMP, $$<)

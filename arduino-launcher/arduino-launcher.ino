@@ -39,8 +39,8 @@
 //                              VCC |     | GND
 //                  [D10] XTAL1/PB0 |     | PA0/AREF [D0]
 //                  [ D9] XTAL2/PB1 |     | PA1      [D1] PIN_SR_DS
-//                        RESET/PB3 |     | PA2      [D2] PIN_SR_ST
-// PIN_LAUNCH_BUTT  [ D8]* INT0/PB2 |     | PA3      [D3] PIN_SR_SH
+//                        RESET/PB3 |     | PA2      [D2] PIN_SR_SH
+// PIN_LAUNCH_BUTT  [ D8]* INT0/PB2 |     | PA3      [D3] PIN_SR_ST
 //   PIN_CONT_READ  [ D7]*      PA7 |     | PA4      [D4] PIN_LAUNCH_VIN
 //     PIN_ARM_IND  [ D6]*      PA6 |     | PA5     *[D5] PIN_LAUNCH_FUSE
 //                                  +-----+
@@ -72,6 +72,15 @@
 //                               1  2  3  4  5
 //                              Q3 Q6  +  Q2 D6
 //
+//                              7-seqment -> 595
+//                                 +-------+
+//                                 |  -4-  |
+//                                 | 0   5 |
+//                                 |  -1-  |
+//                                 | 3   2 |
+//                                 |  -6-  |
+//                                 \-------+
+//
 // +---------------------------------------------------------------------------+
 // | PINS
 // +---------------------------------------------------------------------------+
@@ -82,14 +91,16 @@
 #define PIN_ARM_IND 6
 #define PIN_CONT_READ 7
 #define PIN_SR_DS 1
-#define PIN_SR_ST 2
-#define PIN_SR_SH 3
+#define PIN_SR_ST 3
+#define PIN_SR_SH 2
 
 // +---------------------------------------------------------------------------+
 // | CONSTANTS
 // +---------------------------------------------------------------------------+
 #define VIN_DROPOUTS_TH 10
 #define COUNTDOWN_MAX 10
+#define FIRE_FOR_MILLIS 4000UL
+#define ARM_COOLING_OFF_PERIOD 1000UL
 
 // +---------------------------------------------------------------------------+
 // | DATA TYPES
@@ -99,7 +110,7 @@ typedef enum {
   LAUNCHSTATE_ARMED,
   LAUNCHSTATE_COUNTDOWN,
   LAUNCHSTATE_FIRING,
-
+  LAUNCHSTATE_POST_FIRE,
 } LaunchState;
 
 // +---------------------------------------------------------------------------+
@@ -113,7 +124,8 @@ typedef struct Sketch_t {
   uint8_t vread_dropouts;
   unsigned long last_tick;
   unsigned long ind_timer;
-  uint8_t ssmap[11][2];
+  unsigned long state_timer;
+  uint8_t ssmap[11];
 } Sketch;
 
 Sketch sketch = {
@@ -124,8 +136,9 @@ Sketch sketch = {
   0,
   0,
   0,
+  0,
   {
-    {0, 2}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}, {10, 0}
+    0x2, 0x5B, 0x05, 0x09, 0x58, 0x28, 0x20, 0x4B, 0, 0x48, 0x40
   }
 };
 
@@ -133,8 +146,12 @@ Sketch sketch = {
 // | FUNCTIONS
 // +---------------------------------------------------------------------------+
 void change_state(uint8_t newstate) {
+  if (LAUNCHSTATE_ARMED == newstate && millis() - sketch.state_timer < ARM_COOLING_OFF_PERIOD) {
+    return;
+  }
   sketch.launch_state = newstate;
   sketch.countdown = COUNTDOWN_MAX;
+  sketch.state_timer = millis();
 }
 
 void print_state() {
@@ -145,35 +162,40 @@ void print_state() {
     case LAUNCHSTATE_ARMED:
       digitalWrite(PIN_ARM_IND, LOW);
       break;
-    case LAUNCHSTATE_COUNTDOWN:
-      break;
-    case LAUNCHSTATE_FIRING:
-      break;
   }
 }
 
 void update_fire_ind() {
-  if (LAUNCHSTATE_COUNTDOWN == sketch.launch_state) {
-    // blink
-    unsigned long now = millis();
-    if (now - sketch.ind_timer > 500) {
-      digitalWrite(PIN_FIRE_IND, !digitalRead(PIN_FIRE_IND));
-      sketch.ind_timer = now;
-    }
-  } else if (LAUNCHSTATE_FIRING == sketch.launch_state) {
-    digitalWrite(PIN_FIRE_IND, HIGH);
-  } else {
-    digitalWrite(PIN_FIRE_IND, LOW);
+  switch (sketch.launch_state) {
+    case LAUNCHSTATE_COUNTDOWN: {
+        // blink
+        unsigned long now = millis();
+        if (now - sketch.ind_timer > 500) {
+          digitalWrite(PIN_FIRE_IND, !digitalRead(PIN_FIRE_IND));
+          sketch.ind_timer = now;
+        }
+      }
+      break;
+    case LAUNCHSTATE_POST_FIRE:
+    case LAUNCHSTATE_FIRING: {
+        digitalWrite(PIN_FIRE_IND, HIGH);
+      }
+      break;
+    default:
+      digitalWrite(PIN_FIRE_IND, LOW);
   }
+
 }
 
 void on_button() {
+  const unsigned long now = millis();
   switch (sketch.launch_state) {
     case LAUNCHSTATE_ARMED:
       change_state(LAUNCHSTATE_COUNTDOWN);
-      sketch.last_tick = millis();
+      sketch.last_tick = now;
       break;
     case LAUNCHSTATE_FIRING:
+    case LAUNCHSTATE_POST_FIRE:
     case LAUNCHSTATE_COUNTDOWN:
       change_state(LAUNCHSTATE_DISARMED);
       break;
@@ -198,10 +220,18 @@ void check_continuity() {
 
 void update_7segment() {
   digitalWrite(PIN_SR_ST, LOW);
-  if (LAUNCHSTATE_COUNTDOWN == sketch.launch_state) {
-    shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, 3);
-  } else {
-    shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, 0xFF);
+  switch (sketch.launch_state) {
+    case LAUNCHSTATE_FIRING: {
+        shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, sketch.ssmap[0]);
+      }
+      break;
+    case LAUNCHSTATE_COUNTDOWN: {
+        shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, sketch.ssmap[sketch.countdown]);
+      }
+      break;
+    default: {
+        shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, 0xFF);
+      }
   }
   digitalWrite(PIN_SR_ST, HIGH);
 }
@@ -220,11 +250,14 @@ void setup() {
   pinMode(PIN_SR_ST, OUTPUT);
   pinMode(PIN_SR_SH, OUTPUT);
   digitalWrite(PIN_LAUNCH_FUSE, LOW);
+  PORTA &= ~(1 << PINA4);
+  DDRA &= ~(1 << DDA4);
   sketch.button_state = LAUNCHSTATE_ARMED;
 }
 
 // +---------------------------------------------------------------------------+
 void loop() {
+  const unsigned long now = millis();
   check_continuity();
   update_7segment();
   update_fire_ind();
@@ -239,7 +272,6 @@ void loop() {
     sketch.button_tripped = 0;
   }
   if (LAUNCHSTATE_COUNTDOWN == sketch.launch_state) {
-    const unsigned long now = millis();
     if (now - sketch.last_tick >= 1000) {
       sketch.last_tick = now;
       --sketch.countdown;
@@ -250,6 +282,9 @@ void loop() {
   }
   if (LAUNCHSTATE_FIRING == sketch.launch_state) {
     digitalWrite(PIN_LAUNCH_FUSE, HIGH);
+    if (now - sketch.state_timer > FIRE_FOR_MILLIS) {
+      change_state(LAUNCHSTATE_POST_FIRE);
+    }
   } else {
     digitalWrite(PIN_LAUNCH_FUSE, LOW);
   }
