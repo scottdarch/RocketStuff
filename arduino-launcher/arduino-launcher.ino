@@ -41,7 +41,7 @@
 //                  [ D9] XTAL2/PB1 |     | PA1      [D1] PIN_SR_DS
 //                        RESET/PB3 |     | PA2      [D2] PIN_SR_SH
 // PIN_LAUNCH_BUTT  [ D8]* INT0/PB2 |     | PA3      [D3] PIN_SR_ST
-//   PIN_CONT_READ  [ D7]*      PA7 |     | PA4      [D4] PIN_LAUNCH_VIN
+//        (unused)  [ D7]*      PA7 |     | PA4      [D4] PIN_LAUNCH_VIN
 //     PIN_ARM_IND  [ D6]*      PA6 |     | PA5     *[D5] PIN_LAUNCH_FUSE
 //                                  +-----+
 //                                                                     (*==PWM)
@@ -89,7 +89,6 @@
 #define PIN_LAUNCH_VIN 4
 #define PIN_FIRE_IND 0
 #define PIN_ARM_IND 6
-#define PIN_CONT_READ 7
 #define PIN_SR_DS 1
 #define PIN_SR_ST 3
 #define PIN_SR_SH 2
@@ -98,9 +97,10 @@
 // | CONSTANTS
 // +---------------------------------------------------------------------------+
 #define VIN_DROPOUTS_TH 10
-#define COUNTDOWN_MAX 10
 #define FIRE_FOR_MILLIS 4000UL
+#define COUNTDOWN_MAX 3
 #define ARM_COOLING_OFF_PERIOD 1000UL
+#define FIRE_VOLTAGE_RISE_TIME 100
 
 // +---------------------------------------------------------------------------+
 // | DATA TYPES
@@ -119,6 +119,7 @@ typedef enum {
 typedef struct Sketch_t {
   uint8_t button_state;
   uint8_t launch_state;
+  uint8_t pending_state;
   uint8_t countdown;
   uint8_t button_tripped;
   uint8_t vread_dropouts;
@@ -130,6 +131,7 @@ typedef struct Sketch_t {
 
 Sketch sketch = {
   0,
+  LAUNCHSTATE_DISARMED,
   LAUNCHSTATE_DISARMED,
   COUNTDOWN_MAX,
   0,
@@ -145,40 +147,55 @@ Sketch sketch = {
 // +---------------------------------------------------------------------------+
 // | FUNCTIONS
 // +---------------------------------------------------------------------------+
-void change_state(uint8_t newstate) {
-  if (LAUNCHSTATE_ARMED == newstate && millis() - sketch.state_timer < ARM_COOLING_OFF_PERIOD) {
+void check_state(unsigned long now) {
+  if (sketch.pending_state == sketch.launch_state) {
     return;
   }
-  sketch.launch_state = newstate;
+
+  if (LAUNCHSTATE_ARMED == sketch.pending_state && now - sketch.state_timer < ARM_COOLING_OFF_PERIOD) {
+    return;
+  }
+  sketch.last_tick = now;
+  sketch.launch_state = sketch.pending_state;
   sketch.countdown = COUNTDOWN_MAX;
-  sketch.state_timer = millis();
+  sketch.state_timer = now;
+  update_7segment(now);
 }
 
-void print_state() {
+void change_state(uint8_t pending_state) {
+  sketch.pending_state = pending_state;
+}
+
+void update_armed_ind(unsigned long now) {
   switch (sketch.launch_state) {
-    case LAUNCHSTATE_DISARMED:
-      digitalWrite(PIN_ARM_IND, HIGH);
-      break;
     case LAUNCHSTATE_ARMED:
       digitalWrite(PIN_ARM_IND, LOW);
       break;
+    default:
+      digitalWrite(PIN_ARM_IND, HIGH);
+      break;
   }
 }
 
-void update_fire_ind() {
+void update_fire_ind(unsigned long now) {
   switch (sketch.launch_state) {
     case LAUNCHSTATE_COUNTDOWN: {
         // blink
-        unsigned long now = millis();
         if (now - sketch.ind_timer > 500) {
           digitalWrite(PIN_FIRE_IND, !digitalRead(PIN_FIRE_IND));
           sketch.ind_timer = now;
         }
       }
       break;
-    case LAUNCHSTATE_POST_FIRE:
-    case LAUNCHSTATE_FIRING: {
+    case LAUNCHSTATE_POST_FIRE: {
         digitalWrite(PIN_FIRE_IND, HIGH);
+      }
+      break;
+    case LAUNCHSTATE_FIRING: {
+        if (now - sketch.ind_timer > 25) {
+          digitalWrite(PIN_FIRE_IND, !digitalRead(PIN_FIRE_IND));
+          sketch.ind_timer = now;
+        }
       }
       break;
     default:
@@ -187,12 +204,10 @@ void update_fire_ind() {
 
 }
 
-void on_button() {
-  const unsigned long now = millis();
+void on_button(unsigned long now) {
   switch (sketch.launch_state) {
     case LAUNCHSTATE_ARMED:
       change_state(LAUNCHSTATE_COUNTDOWN);
-      sketch.last_tick = now;
       break;
     case LAUNCHSTATE_FIRING:
     case LAUNCHSTATE_POST_FIRE:
@@ -200,28 +215,30 @@ void on_button() {
       change_state(LAUNCHSTATE_DISARMED);
       break;
   }
-  sketch.countdown = COUNTDOWN_MAX;
 }
 
-void check_continuity() {
+void check_continuity(unsigned long now) {
   if (LAUNCHSTATE_FIRING != sketch.launch_state) {
     if (digitalRead(PIN_LAUNCH_VIN)) {
-      sketch.vread_dropouts = 0;
-      if (LAUNCHSTATE_DISARMED == sketch.launch_state) {
+      if (sketch.vread_dropouts > 0) {
+        --sketch.vread_dropouts;
+      } else if (LAUNCHSTATE_DISARMED == sketch.launch_state) {
         change_state(LAUNCHSTATE_ARMED);
-        digitalWrite(PIN_CONT_READ, HIGH);
       }
-    } else if (++sketch.vread_dropouts < VIN_DROPOUTS_TH) {
-      change_state(LAUNCHSTATE_DISARMED);
-      digitalWrite(PIN_CONT_READ, LOW);
+    } else if (now - sketch.last_tick > FIRE_VOLTAGE_RISE_TIME ) {
+      // always allow time for the voltage to come back up after firing.
+      ++sketch.vread_dropouts;
+      if (sketch.vread_dropouts < VIN_DROPOUTS_TH) {
+        change_state(LAUNCHSTATE_DISARMED);
+      }
     }
   }
 }
 
-void update_7segment() {
+void update_7segment(unsigned long now) {
   digitalWrite(PIN_SR_ST, LOW);
   switch (sketch.launch_state) {
-    case LAUNCHSTATE_FIRING: {
+    case LAUNCHSTATE_POST_FIRE: {
         shiftOut(PIN_SR_DS, PIN_SR_SH, MSBFIRST, sketch.ssmap[0]);
       }
       break;
@@ -240,33 +257,42 @@ void update_7segment() {
 // | SKETCH
 // +---------------------------------------------------------------------------+
 void setup() {
+  const unsigned long now = millis();
   pinMode(PIN_LAUNCH_BUTT, INPUT_PULLUP);
   pinMode(PIN_LAUNCH_FUSE, OUTPUT);
   pinMode(PIN_LAUNCH_VIN, INPUT);
   pinMode(PIN_FIRE_IND, OUTPUT);
   pinMode(PIN_ARM_IND, OUTPUT);
-  pinMode(PIN_CONT_READ, OUTPUT);
   pinMode(PIN_SR_DS, OUTPUT);
   pinMode(PIN_SR_ST, OUTPUT);
   pinMode(PIN_SR_SH, OUTPUT);
   digitalWrite(PIN_LAUNCH_FUSE, LOW);
+  digitalWrite(PIN_SR_ST, LOW);
+  digitalWrite(PIN_ARM_IND, HIGH);
   PORTA &= ~(1 << PINA4);
   DDRA &= ~(1 << DDA4);
-  sketch.button_state = LAUNCHSTATE_ARMED;
+  sketch.pending_state = sketch.launch_state = LAUNCHSTATE_DISARMED;
+  sketch.last_tick = now;
+  update_7segment(now);
+  for (uint8_t i = 0; i < 3; ++i) {
+    digitalWrite(PIN_FIRE_IND, HIGH);
+    delay(50);
+    digitalWrite(PIN_FIRE_IND, LOW);
+    delay(10);
+  }
 }
 
 // +---------------------------------------------------------------------------+
 void loop() {
   const unsigned long now = millis();
-  check_continuity();
-  update_7segment();
-  update_fire_ind();
-  print_state();
+  check_continuity(now);
+  update_fire_ind(now);
+  update_armed_ind(now);
   sketch.button_state = (sketch.button_state << 1) | !digitalRead(PIN_LAUNCH_BUTT);
   if (0xF == (0xF & sketch.button_state)) {
     if (!sketch.button_tripped) {
       sketch.button_tripped = true;
-      on_button();
+      on_button(now);
     }
   } else if (0x00 == (0xF & sketch.button_state)) {
     sketch.button_tripped = 0;
@@ -275,6 +301,7 @@ void loop() {
     if (now - sketch.last_tick >= 1000) {
       sketch.last_tick = now;
       --sketch.countdown;
+      update_7segment(now);
     }
     if (!sketch.countdown) {
       change_state(LAUNCHSTATE_FIRING);
@@ -288,4 +315,5 @@ void loop() {
   } else {
     digitalWrite(PIN_LAUNCH_FUSE, LOW);
   }
+  check_state(now);
 }
