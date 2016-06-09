@@ -1,12 +1,8 @@
-#  NiftyLauncher (by 32bits.io)
+#  
+#  Tinker Build
+#                                                                    [.+]
 #
-#                                                                      /
-#
-#                                                                    (
-#                                                                   C)
-#                                                                 (C))
-#                                                               )()C))C
-# ___________________________________________________________(C))C)()C)________
+# -----------------------------------------------------------------------------                              
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -27,6 +23,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
 
 # +----------------------------------------------------------------------------+
 # | COMMANDS AND DEFINITIONS
@@ -49,7 +46,7 @@ DEPFLAGS         = -MT $@ -MMD -MP -MF "$(patsubst %.o,%.Td,$@)"
 
 POSTCOMPILE      = mv -f $(patsubst %.o,%.Td,$@) $(patsubst %.o,%.d,$@)
 
-CFLAGS          +=  \
+GLOBAL_CFLAGS   +=  \
                     -mmcu=$(BOARD_MCU) \
                     -std=c99 \
                     -Wall \
@@ -61,20 +58,20 @@ CFLAGS          +=  \
                     -DF_CPU=$(BOARD_MCU_CLK) \
 
 ifdef DEBUG
-CFLAGS          += -ggdb \
+GLOBAL_CFLAGS   += -ggdb \
                    -DDEBUG \
                    -Og \
 
 else
-CFLAGS          += -Os \
+GLOBAL_CFLAGS   += -Os \
 
 endif
 
-CFLAGS          += $(LOCAL_ENV_CFLAGS)
+GLOBAL_CFLAGS   += $(LOCAL_ENV_CFLAGS)
 
-LDFLAGS         := $(foreach LIB,$(LIBS),-l$(LIB))
-LDFLAGS         += $(foreach _LIB_PATH,$(LIB_PATH),-L$(_LIB_PATH))
-LDFLAGS         += -pipe \
+GLOBAL_LDFLAGS         := $(foreach LIB,$(LIBS),-l$(LIB))
+GLOBAL_LDFLAGS         += $(foreach _LIB_PATH,$(LIB_PATH),-L$(_LIB_PATH))
+GLOBAL_LDFLAGS         += -pipe \
                    -Wl,--no-gc-sections \
                    -Wl,--print-gc-sections \
                    -Wl,--unresolved-symbols=report-all \
@@ -142,7 +139,7 @@ $$(addprefix $$(BUILD_FOLDER)/,$(1).hex) : $$(addprefix $$(BUILD_FOLDER)/,$(1).e
 
 $$(addprefix $$(BUILD_FOLDER)/,$(1).elf) : $(2)
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(BOARD_GCC_PREFIX)gcc $$(CFLAGS) $$(LDFLAGS) -o $$@ $$^
+	$$(BOARD_GCC_PREFIX)gcc $$(GLOBAL_CFLAGS) $$(GLOBAL_LDFLAGS) -o $$@ $$^
 
 $$(BUILD_FOLDER)/%.o : %.s $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
@@ -151,7 +148,7 @@ $$(BUILD_FOLDER)/%.o : %.s $$(BUILD_FOLDER)/%.d
 
 $$(BUILD_FOLDER)/%.o : %.c $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(BOARD_GCC_PREFIX)gcc $$(DEPFLAGS) $$(CFLAGS) -Iinclude $(addprefix -I,$(sort $(3))) -c $$< -o $$@
+	$$(BOARD_GCC_PREFIX)gcc $$(DEPFLAGS) $$(GLOBAL_CFLAGS) -Iinclude $(addprefix -I,$(sort $(3))) -c $$< -o $$@
 	$$(POSTCOMPILE)
 
 endef

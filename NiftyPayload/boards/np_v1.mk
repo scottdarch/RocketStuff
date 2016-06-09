@@ -1,5 +1,5 @@
-#  NiftyLauncher (by 32bits.io)
-#
+#  NifyPayload (by 32bits.io)
+#                                                                       .
 #                                                                      /
 #
 #                                                                    (
@@ -27,26 +27,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-PROJECT_NAME        := NiftyLauncher
-BUILD_SUPPORT_DIR   := build_support
 
-# +----------------------------------------------------------------------------+
-# | DEFAULTS
-# +----------------------------------------------------------------------------+
-LOCAL_ENV_TOOLCHAIN ?= avr-gcc
-LOCAL_ENV_BOARD     ?= nl_v1
-# +----------------------------------------------------------------------------+
-include $(BUILD_SUPPORT_DIR)/Common.mk
-
-# +----------------------------------------------------------------------------+
-# | MODULES
-# +----------------------------------------------------------------------------+
-include $(COMMAND_RESET)
-LOCAL_DIR := src
-include src/Module.mk
-include $(COMMAND_REST)
-# +----------------------------------------------------------------------------+
-
-include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
-
+BOARD                         := np_v1
+BOARD_MCU                     := nRF51822
+BOARD_MCU_CLK                 := 8000000UL
+BOARD_MCU_ARCH                := arm-none-eabi
+BOARD_GCC_PREFIX              := $(BOARD_MCU_ARCH)-
+BOARD_TOOLCHAINS              := gcc-arm-none-eabi

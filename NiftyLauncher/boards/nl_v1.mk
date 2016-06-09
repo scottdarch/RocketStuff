@@ -27,10 +27,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-LOCAL_MODULE_NAME        :=
-LOCAL_INCLUDES           :=
-LOCAL_OBJS               :=
-LOCAL_SRC_C              :=
-LOCAL_SRC_S              :=
-LOCAL_DIR                :=
+
+BOARD                         := nl_v1
+BOARD_MCU                     := attiny84
+BOARD_MCU_CLK                 := 8000000UL
+BOARD_MCU_ARCH                := avr
+BOARD_GCC_PREFIX              := $(BOARD_MCU_ARCH)-
+BOARD_HFUSE                   := DF
+BOARD_LFUSE_DEFAULT           := E2
+BOARD_LFUSE_EXTOSC_8MHZ       := FF
+BOARD_EFUSE                   := FF
+BOARD_LKFUSE_UNLOCKED         := FF
+BOARD_PROGRAM_FUSE_DEFAULT    := -e -u -U lock:w:0x$(BOARD_LKFUSE_UNLOCKED):m -U efuse:w:0x$(BOARD_EFUSE):m -U hfuse:w:0x$(BOARD_HFUSE):m -U lfuse:w:0x$(BOARD_LFUSE_DEFAULT):m
+BOARD_PROGRAM_FUSE_NL_V1      := -e -u -U lock:w:0x$(BOARD_LKFUSE_UNLOCKED):m -U efuse:w:0x$(BOARD_EFUSE):m -U hfuse:w:0x$(BOARD_HFUSE):m -U lfuse:w:0x$(BOARD_LFUSE_EXTOSC_8MHZ):m
+BOARD_PROGRAM_FIRMWARE         = -U flash:w:$<
+BOARD_TOOLCHAINS              := avr-gcc
+GLOBAL_CFLAGS                 += -D__AVR_ATtiny84__

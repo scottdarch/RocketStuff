@@ -1,12 +1,8 @@
-#  NiftyLauncher (by 32bits.io)
+#  
+#  Tinker Build
+#                                                                    [.+]
 #
-#                                                                      /
-#
-#                                                                    (
-#                                                                   C)
-#                                                                 (C))
-#                                                               )()C))C
-# ___________________________________________________________(C))C)()C)________
+# -----------------------------------------------------------------------------                              
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -28,12 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# +----------------------------------------------------------------------------+
+
 TMP_OBJS            := $(addprefix $(BUILD_FOLDER)/, $(LOCAL_SRC_C:.c=.o)) \
-                       $(addprefix $(BUILD_FOLDER)/, $(LOCAL_SRC_S:.s=.o)) \
 
 INFO_OBJS    += $(TMP_OBJS)
-INFO_SOURCE  += $(LOCAL_SRC_C) $(LOCAL_SRC_S)
+INFO_SOURCE  += $(LOCAL_SRC_C)
 
 
 $(eval $(call generate_binary_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS), $(LOCAL_INCLUDES)))

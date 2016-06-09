@@ -1,12 +1,8 @@
-#  NiftyLauncher (by 32bits.io)
+#  
+#  Tinker Build
+#                                                                    [.+]
 #
-#                                                                      /
-#
-#                                                                    (
-#                                                                   C)
-#                                                                 (C))
-#                                                               )()C))C
-# ___________________________________________________________(C))C)()C)________
+# -----------------------------------------------------------------------------                              
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -28,25 +24,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-PROJECT_NAME        := NiftyLauncher
-BUILD_SUPPORT_DIR   := build_support
+
+GLOBAL_PHONIES += all clean info
+
+.PHONY: $(GLOBAL_PHONIES)
+all: $(GLOBAL_GOALS)
+
+clean:
+	$(TOOL_RMDIR) $(BUILD_ROOT)
+	
+info:
+	@echo "+----------------------------------------------------------------------------+"
+	@echo "| $(PROJECT_NAME)"
+	@echo "| $(ANSI_TEXT_GREEN)$(BOARD)-$(LOCAL_ENV_FLAVOR) :: $(GCCPREFIX)$(ANSI_CLEAR)"
+	@echo "+----------------------------------------------------------------------------+"
+	@echo
+	@echo "$(ANSI_BLONWHT)SOURCE:$(ANSI_CLEAR)" $(addprefix "\n\t", $(sort $(INFO_SOURCE)))
+	@echo
+	@echo "$(ANSI_BLONWHT)OBJS:$(ANSI_CLEAR)" $(addprefix "\n\t", $(sort $(INFO_OBJS)))
+	@echo
+	@echo "$(ANSI_BLONWHT)INCLUDES:$(ANSI_CLEAR)" $(addprefix "\n\t", $(sort $(GLOBAL_INCLUDE_PATHS)))
+	@echo
+	@echo "$(ANSI_BLONWHT)OUTPUTS:$(ANSI_CLEAR)" $(addprefix "\n\t", $(sort $(GLOBAL_GOALS)))
+	@echo
+	@echo "$(ANSI_BLONWHT)TARGETS:$(ANSI_CLEAR)" $(addprefix "\n\t", $(sort $(GLOBAL_PHONIES)))
+	@echo
 
 # +----------------------------------------------------------------------------+
-# | DEFAULTS
+# | AUTO DEPENDENCIES
 # +----------------------------------------------------------------------------+
-LOCAL_ENV_TOOLCHAIN ?= avr-gcc
-LOCAL_ENV_BOARD     ?= nl_v1
-# +----------------------------------------------------------------------------+
-include $(BUILD_SUPPORT_DIR)/Common.mk
+%.d : ;
+.PRECIOUS: %.d
 
-# +----------------------------------------------------------------------------+
-# | MODULES
-# +----------------------------------------------------------------------------+
-include $(COMMAND_RESET)
-LOCAL_DIR := src
-include src/Module.mk
-include $(COMMAND_REST)
-# +----------------------------------------------------------------------------+
+-include $(OBJS:.o=.d)
 
-include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
-
+.DELETE_ON_ERROR: ;

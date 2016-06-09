@@ -1,5 +1,5 @@
-#  NiftyLauncher (by 32bits.io)
-#
+#  NifyPayload (by 32bits.io)
+#                                                                       .
 #                                                                      /
 #
 #                                                                    (
@@ -28,17 +28,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# See http://wiki.bash-hackers.org/scripting/terminalcodes for reference
-ANSI_CLEAR      := \033[0m
-ANSI_TEXT_BLK   := \033[30m
-ANSI_TEXT_RED   := \033[31m
-ANSI_TEXT_GREEN := \033[32m
-ANSI_TEXT_YELO  := \033[33m
-ANSI_TEXT_BLUE  := \033[34m
-ANSI_TEXT_MAG   := \033[35m
-ANSI_TEXT_CYAN  := \033[36m
-ANSI_TEXT_WHT   := \033[37m
-ANSI_TEXT_DEF   := \033[39m
-ANSI_BG_WHT     := \033[47m
-ANSI_REDONWHT   := $(ANSI_TEXT_RED)$(ANSI_BG_WHT)
-ANSI_BLONWHT    := $(ANSI_TEXT_BLUE)$(ANSI_BG_WHT)
+PROJECT_NAME        := NiftyPayload
+BUILD_SUPPORT_DIR   := build_support
+
+# +----------------------------------------------------------------------------+
+# | DEFAULTS
+# +----------------------------------------------------------------------------+
+LOCAL_ENV_TOOLCHAIN ?= gcc-arm-none-eabi
+LOCAL_ENV_BOARD     ?= np_v1
+
+# +----------------------------------------------------------------------------+
+include $(BUILD_SUPPORT_DIR)/Common.mk
+
+# +----------------------------------------------------------------------------+
+# | MODULES
+# +----------------------------------------------------------------------------+
+include $(COMMAND_RESET)
+LOCAL_DIR := src
+include src/Module.mk
+include $(COMMAND_REST)
+# +----------------------------------------------------------------------------+
+
+include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
+
