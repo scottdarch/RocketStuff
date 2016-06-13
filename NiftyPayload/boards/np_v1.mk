@@ -29,7 +29,9 @@
 # SOFTWARE.
 
 BOARD                         := np_v1
-BOARD_MCU                     := nRF51822
+BOARD_DEVICE
+BOARD_TARGET_CHIP             := nRF51822
+BOARD_MCU                     := cortex-m0
 BOARD_MCU_CLK                 := 8000000UL
 BOARD_MCU_ARCH                := arm-none-eabi
 BOARD_GCC_PREFIX              := $(BOARD_MCU_ARCH)-
