@@ -28,12 +28,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+
+LOCAL_MODULE_NAME := nrf_library_util
+
+LOCAL_INCLUDES := $(SDK_NRF5_COMPONENTS_PATH)/device \
+                  $(SDK_NRF5_LIBS_PATH)/util
+
+LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c)
+
+include $(COMMAND_MAKE_ARCHIVE)
+include $(COMMAND_RESET)
+# +---------------------------------------------------------------------------+
+
 LOCAL_MODULE_NAME := $(PROJECT_NAME)
 
 LOCAL_INCLUDES += $(LOCAL_DIR) \
                   $(LOCAL_DIR)/$(BOARD) \
 
 LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \
-                   $(LOCAL_DIR)/$(BOARD)/board.c \
 
 include $(COMMAND_MAKE_BINARY)

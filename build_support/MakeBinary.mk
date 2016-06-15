@@ -30,8 +30,8 @@ TMP_OBJS            := $(addprefix $(BUILD_FOLDER)/, $(LOCAL_SRC_C:.c=.o)) \
 INFO_OBJS    += $(TMP_OBJS)
 INFO_SOURCE  += $(LOCAL_SRC_C)
 
-
-$(eval $(call generate_binary_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS), $(LOCAL_INCLUDES)))
+$(eval $(call generate_object_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS), $(LOCAL_INCLUDES)))
+$(eval $(call generate_binary_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS)))
 
 include $(COMMAND_RESET)
 	

@@ -34,7 +34,6 @@ BUILD_SUPPORT_DIR   := build_support
 # +----------------------------------------------------------------------------+
 # | DEFAULTS
 # +----------------------------------------------------------------------------+
-LOCAL_ENV_TOOLCHAIN ?= gcc-arm-none-eabi
 LOCAL_ENV_BOARD     ?= np_v1
 
 # +----------------------------------------------------------------------------+
@@ -46,7 +45,7 @@ include $(BUILD_SUPPORT_DIR)/Common.mk
 include $(COMMAND_RESET)
 LOCAL_DIR := src
 include src/Module.mk
-include $(COMMAND_REST)
+include $(COMMAND_RESET)
 # +----------------------------------------------------------------------------+
 
 include $(BUILD_SUPPORT_DIR)/CommonTargets.mk

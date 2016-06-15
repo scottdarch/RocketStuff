@@ -52,6 +52,7 @@ LOCAL_MAKEFILE      := $(lastword $(MAKEFILE_LIST))
 
 include $(BUILD_SUPPORT_DIR)/Terminal.mk
 
+COMMAND_MAKE_ARCHIVE:= $(BUILD_SUPPORT_DIR)/MakeArchive.mk
 COMMAND_MAKE_BINARY := $(BUILD_SUPPORT_DIR)/MakeBinary.mk
 COMMAND_RESET       := $(BUILD_SUPPORT_DIR)/Reset.mk
 
@@ -79,13 +80,13 @@ endif
 # +----------------------------------------------------------------------------+
 # | CONFIGURATION
 # +----------------------------------------------------------------------------+
-include boards/$(LOCAL_ENV_BOARD).mk
+include $(LOCAL_ENV_BOARD)/Module.mk
 
 # The board makefile must advertise the toolchains it supports by adding the
 # toolchain to its BOARD_TOOLCHAINS list.
-ifneq ($(filter $(LOCAL_ENV_TOOLCHAIN),$(BOARD_TOOLCHAINS)),) 
-include $(BUILD_SUPPORT_DIR)/$(LOCAL_ENV_TOOLCHAIN)/Toolchain.mk
+ifneq ($(BOARD_TOOLCHAIN),) 
+include $(BUILD_SUPPORT_DIR)/$(BOARD_TOOLCHAIN)/Toolchain.mk
 else
-$(error board "$(LOCAL_ENV_BOARD)" cannot be built using the "$(LOCAL_ENV_TOOLCHAIN)" toolchain)
+$(error board "$(LOCAL_ENV_BOARD)" did not define BOARD_TOOLCHAIN)
 endif
 
