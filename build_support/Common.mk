@@ -2,7 +2,7 @@
 #  Tinker Build
 #                                                                    [.+]
 #
-# -----------------------------------------------------------------------------                              
+# -----------------------------------------------------------------------------
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -41,9 +41,9 @@ GLOBAL_INCLUDE_PATHS   :=
 GLOBAL_CFLAGS          :=
 GLOBAL_SOURCE          :=
 
-INFO_OBJS              :=
-INFO_SOURCE            :=
-
+GLOBAL_MODULES         :=
+GLOBAL_ARCHIVES        :=
+GLOBAL_BINARIES        :=
 
 # +----------------------------------------------------------------------------+
 # | BUILD SUPPORT
@@ -60,6 +60,9 @@ COMMAND_RESET       := $(BUILD_SUPPORT_DIR)/Reset.mk
 define to_abs
 $(addprefix $(ROOT_DIR)/,$(1))
 endef
+
+SDKS_DIR            := $(BUILD_SUPPORT_DIR)/sdks
+TOOLCHAINS_DIR      := $(BUILD_SUPPORT_DIR)/toolchains
 
 # +----------------------------------------------------------------------------+
 # | ENVIRONMENT
@@ -90,7 +93,7 @@ include $(LOCAL_ENV_BOARD)/Module.mk
 # The board makefile must advertise the toolchains it supports by adding the
 # toolchain to its BOARD_TOOLCHAINS list.
 ifneq ($(BOARD_TOOLCHAIN),) 
-include $(BUILD_SUPPORT_DIR)/$(BOARD_TOOLCHAIN)/Toolchain.mk
+include $(TOOLCHAINS_DIR)/$(BOARD_TOOLCHAIN).mk
 else
 $(error board "$(LOCAL_ENV_BOARD)" did not define BOARD_TOOLCHAIN)
 endif

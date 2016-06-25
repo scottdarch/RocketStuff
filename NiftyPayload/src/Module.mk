@@ -28,23 +28,50 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+# +---[NRF5 LIB UTIL]---------------------------------------------------------+
+LOCAL_MODULE_NAME := nrf_library_hal
+
+LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_DRV_PATH)/hal) \
+
+SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
+
+LOCAL_SRC_C += $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
+
+include $(COMMAND_MAKE_ARCHIVE)
+
+TMP_ARCHIVES := $(LOCAL_ARCHIVE)
+include $(COMMAND_RESET)
+
+
+# +---[NRF5 LIB BSP]----------------------------------------------------------+
+LOCAL_MODULE_NAME := nrf_library_bsp
+
+LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_EXAMPLES_PATH)/bsp) \
+
+SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
+
+LOCAL_SRC_C += $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
+
+include $(COMMAND_MAKE_ARCHIVE)
+
+TMP_ARCHIVES += $(LOCAL_ARCHIVE)
+include $(COMMAND_RESET)
+
 
 # +---[NRF5 LIB UTIL]---------------------------------------------------------+
 LOCAL_MODULE_NAME := nrf_library_util
 
 LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/util) \
-                  $(call to_abs,$(SDK_NRF5_EXAMPLES_PATH)/bsp) \
-                  $(call to_abs,$(SDK_NRF5_DRV_PATH)/hal) \
 
 SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
 
 LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c) \
-               $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
-               $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
 
-# TODO: make library which builds archives and creates named include and .a variables
 include $(COMMAND_MAKE_ARCHIVE)
+
+TMP_ARCHIVES += $(LOCAL_ARCHIVE)
 include $(COMMAND_RESET)
+
 
 # +---[NRF5 LIB BUTTON]-------------------------------------------------------+
 LOCAL_MODULE_NAME := nrf_library_button
@@ -55,9 +82,11 @@ SDK_NRF5_LIB_INCLUDES_button := $(LOCAL_INCLUDES)
 
 LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/button/*.c) \
 
-# TODO: make library which builds archives and creates named include and .a variables
 include $(COMMAND_MAKE_ARCHIVE)
+
+TMP_ARCHIVES += $(LOCAL_ARCHIVE)
 include $(COMMAND_RESET)
+
 
 # +---------------------------------------------------------------------------+
 
@@ -69,5 +98,7 @@ LOCAL_INCLUDES += $(SDK_NRF5_LIB_INCLUDES_util) \
                   $(LOCAL_DIR)/$(BOARD) \
 
 LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \
+
+LOCAL_ARCHIVES  := $(TMP_ARCHIVES)
 
 include $(COMMAND_MAKE_BINARY)

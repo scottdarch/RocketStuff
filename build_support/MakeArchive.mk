@@ -2,7 +2,7 @@
 #  Tinker Build
 #                                                                    [.+]
 #
-# -----------------------------------------------------------------------------                              
+# -----------------------------------------------------------------------------
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -25,12 +25,8 @@
 # SOFTWARE.
 #
 
-TMP_OBJS            := $(addprefix $(BUILD_FOLDER)/, $(LOCAL_SRC_C:.c=.o)) \
+$(eval $(call generate_object_recipes, $(LOCAL_MODULE_NAME), $(LOCAL_SRC_C), $(LOCAL_INCLUDES)))
+$(eval $(call generate_archive_recipes, $(LOCAL_MODULE_NAME)))
 
-INFO_OBJS    += $(TMP_OBJS)
-INFO_SOURCE  += $(LOCAL_SRC_C)
+GLOBAL_ARCHIVES += $(LOCAL_MODULE_NAME)
 
-$(eval $(call generate_object_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS), $(LOCAL_INCLUDES)))
-$(eval $(call generate_archive_recipes, $(LOCAL_MODULE_NAME), $(TMP_OBJS)))
-
-include $(COMMAND_RESET)

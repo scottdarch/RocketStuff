@@ -25,22 +25,42 @@
 # SOFTWARE.
 #
 
-GLOBAL_PHONIES += all clean info
-
-.PHONY: $(GLOBAL_PHONIES)
-all: $(GLOBAL_GOALS)
-
-clean:
-	$(TOOL_RMDIR) $(BUILD_ROOT)
-	
-$(eval $(call generate_info_phony_target, $(GLOBAL_ARCHIVES), $(GLOBAL_BINARIES)))
+include $(BUILD_SUPPORT_DIR)/ToolchainDef.mk
 
 # +----------------------------------------------------------------------------+
-# | AUTO DEPENDENCIES
+# | GCC
 # +----------------------------------------------------------------------------+
-%.d : ;
-.PRECIOUS: %.d
+GLOBAL_ASFLAGS  += -mmcu=$(BOARD_MCU) \
+                   -gsstabs \
 
--include $(OBJS:.o=.d)
+GLOBAL_CFLAGS   +=  \
+                    -mmcu=$(BOARD_MCU) \
+                    -ffunction-sections \
+                    -fdata-sections \
+                    -Dprintf=iprintf \
+                    -Dscanf=iscanf \
+                    -DF_CPU=$(BOARD_MCU_CLK) \
 
-.DELETE_ON_ERROR: ;
+GLOBAL_LDFLAGS         += \
+                   -Wl,--no-gc-sections \
+                   -Wl,--print-gc-sections \
+                   -Wl,--unresolved-symbols=report-all \
+                   -Wl,--warn-common \
+                   -Wl,--warn-section-align \
+
+GLOBAL_BINFLAGS := -j .text -j .data
+
+ifndef DEBUG
+GLOBAL_BINFLAGS += -S
+endif
+
+GCC_AVR_HEADERS := $(GCCPREFIX)/$(BOARD_MCU_ARCH)/include
+
+# +----------------------------------------------------------------------------+
+# | AVR TOOLS
+# +----------------------------------------------------------------------------+
+TOOL_PROGRAM          = avrdude -p $(BOARD_MCU) -c dragon_isp $(1)
+TOOL_BOARD_TERM       = avrdude -p $(BOARD_MCU) -c dragon_isp -t
+TOOL_DBGSVR           = avarice -g -w -P $(BOARD_MCU) :4242
+TOOL_BINSIZE          = $(BOARD_GCC_PREFIX)size --mcu=$(BOARD_MCU) --format=avr $(1)
+TOOL_OBJDUMP          = $(BOARD_GCC_PREFIX)objdump -d $(1)

@@ -1,12 +1,8 @@
-#  NifyPayload (by 32bits.io)
-#                                                                       .
-#                                                                      /
+#  
+#  Tinker Build
+#                                                                    [.+]
 #
-#                                                                    (
-#                                                                   C)
-#                                                                 (C))
-#                                                               )()C))C
-# ___________________________________________________________(C))C)()C)________
+# -----------------------------------------------------------------------------
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -27,19 +23,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
 
 # +----------------------------------------------------------------------------+
-# | BOARD DEFINITION
+# | NORDIC SDK
 # +----------------------------------------------------------------------------+
-BOARD                         := np_v1
-BOARD_TARGET_CHIP             := nRF51822
-BOARD_DEVICE                  := NRF51
-BOARD_DEVICESERIES            := nrf51
-BOARD_MCU                     := cortex-m0
-BOARD_MCU_CLK                 := 8000000UL
-BOARD_MCU_ARCH                := arm-none-eabi
-BOARD_GCC_PREFIX              := $(BOARD_MCU_ARCH)-
-BOARD_TOOLCHAIN               := gcc-arm-none-eabi
+SDK_NRF5_SOFTDEVICE       ?= s132
+SDK_NRF5_PATH             ?= $(BUILD_SUPPORT_DIR)/sdks/nRF5_SDK_11.0.0_89a8197
+SDK_NRF5_CMSIS_PATH       := $(SDK_NRF5_PATH)/components/toolchain/CMSIS
+SDK_NRF5_LIBS_PATH        := $(SDK_NRF5_PATH)/components/libraries
+SDK_NRF5_DRV_PATH         := $(SDK_NRF5_PATH)/components/drivers_nrf
+SDK_NRF5_COMPONENTS_PATH  := $(SDK_NRF5_PATH)/components
+SDK_NRF5_EXAMPLES_PATH    := $(SDK_NRF5_PATH)/examples
+GLOBAL_INCLUDE_PATHS      += $(SDK_NRF5_CMSIS_PATH)/Include \
+                             $(SDK_NRF5_COMPONENTS_PATH)/device \
+                             $(SDK_NRF5_COMPONENTS_PATH)/toolchain \
+                             $(SDK_NRF5_COMPONENTS_PATH)/softdevice/$(SDK_NRF5_SOFTDEVICE)/headers \
+                             
 
-include $(SDKS_DIR)/SdkNrf5.mk
-
+GLOBAL_INCLUDE_PATHS := $(sort $(call to_abs,$(GLOBAL_INCLUDE_PATHS)))

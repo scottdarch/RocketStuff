@@ -2,7 +2,7 @@
 #  Tinker Build
 #                                                                    [.+]
 #
-# -----------------------------------------------------------------------------                              
+# -----------------------------------------------------------------------------
 #
 # Copyright (c) 2016 Scott A Dixon.  All right reserved.
 #
@@ -25,7 +25,14 @@
 # SOFTWARE.
 #
 
+ifneq (,$(filter $(LOCAL_MODULE_NAME),$(GLOBAL_MODULES)))
+$(error $(LOCAL_MODULE_NAME) was defined twice!)
+endif
+
+GLOBAL_MODULES           += $(LOCAL_MODULE_NAME)
 LOCAL_MODULE_NAME        :=
 LOCAL_INCLUDES           :=
 LOCAL_OBJS               :=
 LOCAL_SRC_C              :=
+LOCAL_ARCHIVES           :=
+LOCAL_ARCHIVE            :=
