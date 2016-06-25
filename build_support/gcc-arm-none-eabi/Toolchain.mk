@@ -115,11 +115,20 @@ GCCHEADERS      := $(GCCPREFIX)/$(BOARD_MCU_ARCH)/include
 # +----------------------------------------------------------------------------+
 # | NORDIC SDK
 # +----------------------------------------------------------------------------+
+SDK_NRF5_SOFTDEVICE        ?= s132
 SDK_NRF5_PATH             ?= $(BUILD_SUPPORT_DIR)/nRF5_SDK
 SDK_NRF5_CMSIS_PATH       := $(SDK_NRF5_PATH)/components/toolchain/CMSIS
 SDK_NRF5_LIBS_PATH        := $(SDK_NRF5_PATH)/components/libraries
+SDK_NRF5_DRV_PATH         := $(SDK_NRF5_PATH)/components/drivers_nrf
 SDK_NRF5_COMPONENTS_PATH  := $(SDK_NRF5_PATH)/components
+SDK_NRF5_EXAMPLES_PATH    := $(SDK_NRF5_PATH)/examples
 GLOBAL_INCLUDE_PATHS      += $(SDK_NRF5_CMSIS_PATH)/Include \
+                             $(SDK_NRF5_COMPONENTS_PATH)/device \
+                             $(SDK_NRF5_COMPONENTS_PATH)/toolchain \
+                             $(SDK_NRF5_COMPONENTS_PATH)/softdevice/$(SDK_NRF5_SOFTDEVICE)/headers \
+                             
+
+GLOBAL_INCLUDE_PATHS := $(sort $(call to_abs,$(GLOBAL_INCLUDE_PATHS)))
 
 
 # +----------------------------------------------------------------------------+
@@ -127,16 +136,16 @@ GLOBAL_INCLUDE_PATHS      += $(SDK_NRF5_CMSIS_PATH)/Include \
 # +----------------------------------------------------------------------------+
 define generate_object_recipes
 
-GLOBAL_INCLUDE_PATHS += $(sort $(3))
-
 $$(BUILD_FOLDER)/%.o : %.s $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(TOOL_AS) $$(DEPFLAGS) $$(ASFLAGS) $(addprefix -I,$(sort $(3))) -D__ASSEMBLY__ -c $$< -o $$@
+	$$(TOOL_AS) $$(DEPFLAGS) $$(ASFLAGS) $$(addprefix -I,$$(GLOBAL_INCLUDE_PATHS)) \
+        $(addprefix -I,$(sort $(3))) -D__ASSEMBLY__ -c $$< -o $$@
 	$$(POSTCOMPILE)
 
 $$(BUILD_FOLDER)/%.o : %.c $$(BUILD_FOLDER)/%.d
 	@[ -d $$(dir $$@) ] || $$(TOOL_MKDIRS) $$(dir $$@)
-	$$(TOOL_CC) $$(DEPFLAGS) $$(GLOBAL_CFLAGS) $(addprefix -I,$(sort $(3))) -c $$< -o $$@
+	$$(TOOL_CC) $$(DEPFLAGS) $$(GLOBAL_CFLAGS) $$(addprefix -I,$$(GLOBAL_INCLUDE_PATHS)) \
+        $(addprefix -I,$(sort $(3))) -c $$< -o $$@
 	$$(POSTCOMPILE)
 
 endef

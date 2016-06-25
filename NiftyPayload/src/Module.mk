@@ -29,20 +29,43 @@
 # SOFTWARE.
 #
 
+# +---[NRF5 LIB UTIL]---------------------------------------------------------+
 LOCAL_MODULE_NAME := nrf_library_util
 
-LOCAL_INCLUDES := $(SDK_NRF5_COMPONENTS_PATH)/device \
-                  $(SDK_NRF5_LIBS_PATH)/util
+LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/util) \
+                  $(call to_abs,$(SDK_NRF5_EXAMPLES_PATH)/bsp) \
+                  $(call to_abs,$(SDK_NRF5_DRV_PATH)/hal) \
 
-LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c)
+SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
 
+LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c) \
+               $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
+               $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
+
+# TODO: make library which builds archives and creates named include and .a variables
 include $(COMMAND_MAKE_ARCHIVE)
 include $(COMMAND_RESET)
+
+# +---[NRF5 LIB BUTTON]-------------------------------------------------------+
+LOCAL_MODULE_NAME := nrf_library_button
+
+LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/button) \
+
+SDK_NRF5_LIB_INCLUDES_button := $(LOCAL_INCLUDES)
+
+LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/button/*.c) \
+
+# TODO: make library which builds archives and creates named include and .a variables
+include $(COMMAND_MAKE_ARCHIVE)
+include $(COMMAND_RESET)
+
 # +---------------------------------------------------------------------------+
 
 LOCAL_MODULE_NAME := $(PROJECT_NAME)
 
-LOCAL_INCLUDES += $(LOCAL_DIR) \
+LOCAL_INCLUDES += $(SDK_NRF5_LIB_INCLUDES_util) \
+                  $(SDK_NRF5_LIB_INCLUDES_button) \
+                  $(LOCAL_DIR) \
                   $(LOCAL_DIR)/$(BOARD) \
 
 LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \

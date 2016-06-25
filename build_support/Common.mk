@@ -49,12 +49,17 @@ INFO_SOURCE            :=
 # | BUILD SUPPORT
 # +----------------------------------------------------------------------------+
 LOCAL_MAKEFILE      := $(lastword $(MAKEFILE_LIST))
+ROOT_DIR            := $(abspath $(BUILD_SUPPORT_DIR)/../)
 
 include $(BUILD_SUPPORT_DIR)/Terminal.mk
 
 COMMAND_MAKE_ARCHIVE:= $(BUILD_SUPPORT_DIR)/MakeArchive.mk
 COMMAND_MAKE_BINARY := $(BUILD_SUPPORT_DIR)/MakeBinary.mk
 COMMAND_RESET       := $(BUILD_SUPPORT_DIR)/Reset.mk
+
+define to_abs
+$(addprefix $(ROOT_DIR)/,$(1))
+endef
 
 # +----------------------------------------------------------------------------+
 # | ENVIRONMENT

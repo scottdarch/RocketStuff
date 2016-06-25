@@ -29,4 +29,3 @@ LOCAL_MODULE_NAME        :=
 LOCAL_INCLUDES           :=
 LOCAL_OBJS               :=
 LOCAL_SRC_C              :=
-LOCAL_DIR                :=
