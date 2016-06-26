@@ -1,0 +1,8 @@
+[submodule "NiftyPayload/Tinker"]
+	path = NiftyPayload/Tinker
+	url = git@github.com:scottdarch/TInker.git
+	branch = develop
+[submodule "NiftyPayload/SDKs/nRF5_SDK_11.0.0_89a8197"]
+	path = NiftyPayload/SDKs/nRF5_SDK_11.0.0_89a8197
+	url = git@github.com:scottdarch/SDKs.git
+	branch = nRF5_SDK_11.0.0_89a8197

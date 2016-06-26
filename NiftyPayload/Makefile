@@ -29,7 +29,8 @@
 # SOFTWARE.
 #
 PROJECT_NAME        := NiftyPayload
-BUILD_SUPPORT_DIR   := build_support
+BUILD_SUPPORT_DIR   := Tinker/tbuild
+SDKS_DIR            := SDKs
 
 # +----------------------------------------------------------------------------+
 # | DEFAULTS
