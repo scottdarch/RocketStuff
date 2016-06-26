@@ -40,6 +40,4 @@ BOARD_MCU_CLK                 := 8000000UL
 BOARD_MCU_ARCH                := arm-none-eabi
 BOARD_GCC_PREFIX              := $(BOARD_MCU_ARCH)-
 BOARD_TOOLCHAIN               := gcc-arm-none-eabi
-
-include $(SDKS_DIR)/SdkNrf5.mk
-
+BOARD_SDKS                    := SdkNrf5

@@ -88,7 +88,7 @@ endif
 # +----------------------------------------------------------------------------+
 # | CONFIGURATION
 # +----------------------------------------------------------------------------+
-include $(LOCAL_ENV_BOARD)/Module.mk
+include $(LOCAL_ENV_BOARD)/Board.mk
 
 # The board makefile must advertise the toolchains it supports by adding the
 # toolchain to its BOARD_TOOLCHAINS list.
@@ -97,4 +97,6 @@ include $(TOOLCHAINS_DIR)/$(BOARD_TOOLCHAIN).mk
 else
 $(error board "$(LOCAL_ENV_BOARD)" did not define BOARD_TOOLCHAIN)
 endif
+
+$(foreach BOARD_SDK, $(BOARD_SDKS), $(eval include $(SDKS_DIR)/$(BOARD_SDK).mk))
 

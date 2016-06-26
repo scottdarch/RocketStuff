@@ -33,9 +33,9 @@ LOCAL_MODULE_NAME := nrf_library_hal
 
 LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_DRV_PATH)/hal) \
 
-SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
+SDK_NRF5_LIB_INCLUDES_hal := $(LOCAL_INCLUDES)
 
-LOCAL_SRC_C += $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
+LOCAL_SRC_C := $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
 
 include $(COMMAND_MAKE_ARCHIVE)
 
@@ -50,7 +50,7 @@ LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_EXAMPLES_PATH)/bsp) \
 
 SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
 
-LOCAL_SRC_C += $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
+LOCAL_SRC_C := $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
 
 include $(COMMAND_MAKE_ARCHIVE)
 
@@ -65,7 +65,7 @@ LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/util) \
 
 SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
 
-LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c) \
+LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c) \
 
 include $(COMMAND_MAKE_ARCHIVE)
 
@@ -80,7 +80,7 @@ LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/button) \
 
 SDK_NRF5_LIB_INCLUDES_button := $(LOCAL_INCLUDES)
 
-LOCAL_SRC_C += $(wildcard $(SDK_NRF5_LIBS_PATH)/button/*.c) \
+LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/button/*.c) \
 
 include $(COMMAND_MAKE_ARCHIVE)
 
@@ -92,12 +92,13 @@ include $(COMMAND_RESET)
 
 LOCAL_MODULE_NAME := $(PROJECT_NAME)
 
-LOCAL_INCLUDES += $(SDK_NRF5_LIB_INCLUDES_util) \
+LOCAL_INCLUDES := $(SDK_NRF5_LIB_INCLUDES_hal) \
+                  $(SDK_NRF5_LIB_INCLUDES_util) \
                   $(SDK_NRF5_LIB_INCLUDES_button) \
                   $(LOCAL_DIR) \
                   $(LOCAL_DIR)/$(BOARD) \
 
-LOCAL_SRC_C     += $(LOCAL_DIR)/main.c \
+LOCAL_SRC_C     := $(LOCAL_DIR)/main.c \
 
 LOCAL_ARCHIVES  := $(TMP_ARCHIVES)
 

@@ -86,11 +86,9 @@ endif
 
 GLOBAL_CFLAGS   += $(LOCAL_ENV_CFLAGS)
 
-GLOBAL_LDFLAGS         := $(foreach LIB,$(LIBS),-l$(LIB))
-GLOBAL_LDFLAGS         += $(foreach _LIB_PATH,$(LIB_PATH),-L$(_LIB_PATH))
-GLOBAL_LDFLAGS         += -pipe \
-
-GCCPREFIX       := $(strip $(shell $(BOARD_GCC_PREFIX)gcc -v 2>&1 | $(TOOL_AWK) '{FS="--|="; if ( $$2 ~ /prefix/ ) print $$3 }'))
+GLOBAL_LDFLAGS  := $(foreach LIB,$(LIBS),-l$(LIB))
+GLOBAL_LDFLAGS  += $(foreach _LIB_PATH,$(LIB_PATH),-L$(_LIB_PATH))
+GLOBAL_LDFLAGS  += -pipe \
 
 # +----------------------------------------------------------------------------+
 # | TARGET GENERATION
@@ -221,55 +219,77 @@ endef
 # @param $(1) list of archives defined in the makefile
 # @param $(2) list of binaries defined in the makefile
 #
-define generate_info_phony_target
+define generate_info_phony_targets
+
+GLOBAL_PHONIES += info info-all info-board
+
 info:
+	@echo
+	@echo "$$(ANSI_BLONWHT)                                                                              $$(ANSI_CLEAR)"
 	@echo "+----------------------------------------------------------------------------+"
-	@echo "| $$(PROJECT_NAME)"
-	@echo "| $$(ANSI_TEXT_GREEN)$$(BOARD)-$$(LOCAL_ENV_FLAVOR) :: $$(GCCPREFIX)$$(ANSI_CLEAR)"
+	@echo "| $$(PROJECT_NAME)-$$(LOCAL_ENV_FLAVOR)"
 	@echo "+----------------------------------------------------------------------------+"
+	@echo "$$(ANSI_BLONWHT)OUTPUTS:        $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $(GLOBAL_GOALS)))
+	@echo
+	@echo "$$(ANSI_BLONWHT)TARGETS:        $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $(GLOBAL_PHONIES)))
+	@echo
+	
+
+info-board: info
+	@echo "+----------------------------------------------------------------------------+"
+	@echo "| BOARD :: $$(ANSI_TEXT_GREEN)$$(BOARD)$$(ANSI_CLEAR)"
+	@echo "+----------------------------------------------------------------------------+"
+	@echo "$$(ANSI_BLONWHT)GCC_PREFIX:     $$(ANSI_CLEAR) $$(BOARD_GCC_PREFIX)"
+	@echo "$$(ANSI_BLONWHT)TARGET_CHIP:    $$(ANSI_CLEAR) $$(BOARD_TARGET_CHIP)"
+	@echo "$$(ANSI_BLONWHT)DEVICE:         $$(ANSI_CLEAR) $$(BOARD_DEVICE)"
+	@echo "$$(ANSI_BLONWHT)DEVICESERIES:   $$(ANSI_CLEAR) $$(BOARD_DEVICESERIES)"
+	@echo "$$(ANSI_BLONWHT)MCU:            $$(ANSI_CLEAR) $$(BOARD_MCU)"
+	@echo "$$(ANSI_BLONWHT)MCU_CLK:        $$(ANSI_CLEAR) $$(BOARD_MCU_CLK)"
+	@echo "$$(ANSI_BLONWHT)MCU_ARCH:       $$(ANSI_CLEAR) $$(BOARD_MCU_ARCH)"
+	@echo "$$(ANSI_BLONWHT)TOOLCHAIN:      $$(ANSI_CLEAR) $$(BOARD_TOOLCHAIN)"
+	@echo "$$(ANSI_BLONWHT)SDKS:           $$(ANSI_CLEAR) $$(BOARD_SDKS)"
+	@echo
+
+info-tools: info
+	@echo "+----------------------------------------------------------------------------+"
+	@echo "| TOOLS :: $$(ANSI_TEXT_GREEN)$$(BOARD_TOOLCHAIN)$$(ANSI_CLEAR)"
+	@echo "+----------------------------------------------------------------------------+"
+	@echo "$$(ANSI_BLONWHT)CC:             $$(ANSI_CLEAR) $$(TOOL_CC)"
+	@echo "$$(ANSI_BLONWHT)AS              $$(ANSI_CLEAR) $$(TOOL_AS)"
+	@echo "$$(ANSI_BLONWHT)AR              $$(ANSI_CLEAR) $$(TOOL_AR)"
+	@echo "$$(ANSI_BLONWHT)LD              $$(ANSI_CLEAR) $$(TOOL_LD)"
+	@echo "$$(ANSI_BLONWHT)NM              $$(ANSI_CLEAR) $$(TOOL_NM)"
+	@echo "$$(ANSI_BLONWHT)OBJCOPY         $$(ANSI_CLEAR) $$(TOOL_OBJCOPY)"
+	@echo "$$(ANSI_BLONWHT)PROGRAM         $$(ANSI_CLEAR) $$(TOOL_PROGRAM)"
+	@echo "$$(ANSI_BLONWHT)OBJDUMP         $$(ANSI_CLEAR) $$(TOOL_OBJDUMP)"
+	@echo
+
+info-all: info-tools info-board
 	@echo "$$(ANSI_BLONWHT)GLOBAL INCLUDES:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $(GLOBAL_INCLUDE_PATHS)))
 	@echo
-	@echo "$$(ANSI_BLONWHT)OUTPUTS:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $(GLOBAL_GOALS)))
-	@echo
-	@echo "$$(ANSI_BLONWHT)TARGETS:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $(GLOBAL_PHONIES)))
-	$(foreach MODULE,$(1),$(call generate_archive_info,$(MODULE)))
-	$(foreach MODULE,$(2),$(call generate_binary_info,$(MODULE)))
+	$(foreach MODULE,$(1),$(call generate_module_info,ARCHIVE,$(MODULE)))
+	$(foreach MODULE,$(2),$(call generate_module_info,BINARY,$(MODULE)))
 
 endef
 
 #
 # PRIVATE, use $(eval $(call generate_info_phony_target, param1, param2))
 #
-define generate_binary_info
+define generate_module_info
 	
 	@echo "+----------------------------------------------------------------------------+"
-	@echo "| BINARY :: $$(ANSI_TEXT_GREEN)$(1)$$(ANSI_CLEAR)"
+	@echo "| $(1) :: $$(ANSI_TEXT_GREEN)$(2)$$(ANSI_CLEAR)"
 	@echo "+----------------------------------------------------------------------------+"
-	@echo "$$(ANSI_BLONWHT)SOURCE:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_SOURCE)))
+	@echo "$$(ANSI_BLONWHT)SOURCE:        $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(2)_SOURCE)))
 	@echo
-	@echo "$$(ANSI_BLONWHT)ASSEMBLY:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_ASSMBLY)))
+	@echo "$$(ANSI_BLONWHT)ASSEMBLY:      $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(2)_ASSMBLY)))
 	@echo
-	@echo "$$(ANSI_BLONWHT)OBJS:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_OBJS)))
+	@echo "$$(ANSI_BLONWHT)INCLUDES:      $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(2)_INCLUDES)))
 	@echo
-	@echo "$$(ANSI_BLONWHT)ARCHIVES:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_ARCHIVES)))
+	@echo "$$(ANSI_BLONWHT)OBJS:          $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(2)_OBJS)))
+	@echo
+	@echo "$$(ANSI_BLONWHT)ARCHIVES:      $$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(2)_ARCHIVES)))
 	@echo
 endef
 
-#
-# PRIVATE, use $(eval $(call generate_info_phony_target, param1, param2))
-#
-define generate_archive_info
-	
-	@echo "+----------------------------------------------------------------------------+"
-	@echo "| ARCHIVE :: $$(ANSI_TEXT_GREEN)$(1)$$(ANSI_CLEAR)"
-	@echo "+----------------------------------------------------------------------------+"
-	@echo "$$(ANSI_BLONWHT)SOURCE:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_SOURCE)))
-	@echo
-	@echo "$$(ANSI_BLONWHT)ASSEMBLY:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_ASSMBLY)))
-	@echo
-	@echo "$$(ANSI_BLONWHT)OBJS:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_OBJS)))
-	@echo
-	@echo "$$(ANSI_BLONWHT)ARCHIVES:$$(ANSI_CLEAR)" $$(addprefix "\n\t", $$(sort $$($(1)_ARCHIVES)))
-	@echo
-endef
 
