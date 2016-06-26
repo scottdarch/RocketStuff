@@ -99,7 +99,9 @@ LOCAL_INCLUDES := $(SDK_NRF5_LIB_INCLUDES_hal) \
                   $(LOCAL_DIR)/$(BOARD) \
 
 LOCAL_SRC_C     := $(LOCAL_DIR)/main.c \
+                   $(SDK_NRF5_TOOLCHAIN_GCC)/gcc_startup_$(BOARD_DEVICE).s \
 
 LOCAL_ARCHIVES  := $(TMP_ARCHIVES)
+LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_nrf51.ld
 
 include $(COMMAND_MAKE_BINARY)

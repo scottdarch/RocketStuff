@@ -25,14 +25,12 @@
 # SOFTWARE.
 #
 
-GLOBAL_PHONIES += all clean
-
-all: $(GLOBAL_GOALS)
+GLOBAL_PHONIES += clean
 
 clean:
 	$(TOOL_RMDIR) $(BUILD_ROOT)
 	
-$(eval $(call generate_info_phony_targets, $(GLOBAL_ARCHIVES), $(GLOBAL_BINARIES)))
+$(eval $(call generate_info_phony_targets, $(GLOBAL_GOALS), $(GLOBAL_PHONIES), $(GLOBAL_ARCHIVES), $(GLOBAL_BINARIES)))
 
 .PHONY: $(GLOBAL_PHONIES)
 

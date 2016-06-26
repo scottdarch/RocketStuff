@@ -30,9 +30,6 @@ include $(BUILD_SUPPORT_DIR)/ToolchainDef.mk
 # +----------------------------------------------------------------------------+
 # | GCC
 # +----------------------------------------------------------------------------+
-GLOBAL_ASFLAGS  += -mmcu=$(BOARD_MCU) \
-                   -gsstabs \
-
 GLOBAL_CFLAGS   +=  \
                     -mmcu=$(BOARD_MCU) \
                     -ffunction-sections \
@@ -40,13 +37,11 @@ GLOBAL_CFLAGS   +=  \
                     -Dprintf=iprintf \
                     -Dscanf=iscanf \
                     -DF_CPU=$(BOARD_MCU_CLK) \
+                    -gstabs \
 
-GLOBAL_LDFLAGS         += \
-                   -Wl,--no-gc-sections \
-                   -Wl,--print-gc-sections \
-                   -Wl,--unresolved-symbols=report-all \
-                   -Wl,--warn-common \
-                   -Wl,--warn-section-align \
+GLOBAL_LDFLAGS  += \
+                   --no-gc-sections \
+                   --print-gc-sections \
 
 GLOBAL_BINFLAGS := -j .text -j .data
 

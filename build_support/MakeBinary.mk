@@ -26,7 +26,5 @@
 #
 
 $(eval $(call generate_object_recipes, $(LOCAL_MODULE_NAME), $(LOCAL_SRC_C), $(LOCAL_INCLUDES)))
-$(eval $(call generate_binary_recipes, $(LOCAL_MODULE_NAME), $(LOCAL_ARCHIVES)))
-
-GLOBAL_BINARIES += $(LOCAL_MODULE_NAME)
+$(eval $(call generate_binary_recipes, $(LOCAL_MODULE_NAME), $(LOCAL_ARCHIVES), $(LOCAL_LINKER_SCRIPT)))
 

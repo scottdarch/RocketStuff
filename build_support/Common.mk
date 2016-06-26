@@ -45,11 +45,14 @@ GLOBAL_MODULES         :=
 GLOBAL_ARCHIVES        :=
 GLOBAL_BINARIES        :=
 
+.SUFFIXES:
+
 # +----------------------------------------------------------------------------+
 # | BUILD SUPPORT
 # +----------------------------------------------------------------------------+
 LOCAL_MAKEFILE      := $(lastword $(MAKEFILE_LIST))
 ROOT_DIR            := $(abspath $(BUILD_SUPPORT_DIR)/../)
+COMMA               = ,
 
 include $(BUILD_SUPPORT_DIR)/Terminal.mk
 
@@ -70,6 +73,7 @@ TOOLCHAINS_DIR      := $(BUILD_SUPPORT_DIR)/toolchains
 LOCAL_ENV_FLAVOR    ?= debug
 LOCAL_ENV_TOOLCHAIN ?=
 LOCAL_ENV_BOARD     ?=
+LOCAL_ENV_OS        ?= $(shell uname)
 
 # use `make [target] DEBUG=1` to override environment setting
 ifndef DEBUG
@@ -78,12 +82,23 @@ DEBUG           := 1
 endif
 endif
 
-BUILD_ROOT      := .build
+BUILD_ROOT      := build
 ifdef DEBUG
 BUILD_FOLDER    := $(BUILD_ROOT)/Debug
 else
 BUILD_FOLDER    := $(BUILD_ROOT)/Release
 endif
+
+# +----------------------------------------------------------------------------+
+# | THE DEFAULT RULE
+# +----------------------------------------------------------------------------+
+GLOBAL_PHONIES += all
+
+.SECONDEXPANSION:
+
+# because the GLOBAL_GOALS is populated by the SDK and module rules we need to
+# expand all's prerequisites after they have all been defined.
+all: $$(GLOBAL_GOALS)
 
 # +----------------------------------------------------------------------------+
 # | CONFIGURATION

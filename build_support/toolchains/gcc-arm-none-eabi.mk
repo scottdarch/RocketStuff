@@ -38,40 +38,14 @@ TOOL_LD              := "$(BOARD_GCC_PREFIX)ld"
 TOOL_NM              := "$(BOARD_GCC_PREFIX)nm"
 TOOL_OBJCOPY         := "$(BOARD_GCC_PREFIX)objcopy"
 
-TOOL_PROGRAM         := openocd
 TOOL_OBJDUMP         := $(BOARD_GCC_PREFIX)objdump -d $(1)
 
 # +----------------------------------------------------------------------------+
 # | GCC
 # +----------------------------------------------------------------------------+
-GNU_INSTALL_ROOT ?= /usr/local/gcc-arm-none-eabi-4_9-2015q1
-GNU_VERSION      ?= 4.9.3
-
-GLOBAL_ASFLAGS  := -mcpu=$(BOARD_MCU) \
-                   -gsstabs \
-                   -x assembler-with-cpp \
-
-GLOBAL_CFLAGS   +=  \
+# see https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html for the GCC reference.
+GLOBAL_CFLAGS   +=  $(LOCAL_ENV_CFLAGS) \
                     -mcpu=$(BOARD_MCU) \
-                    -mthumb \
-                    -mabi=aapcs \
-                    -D$(BOARD_DEVICE) \
-                    -D$(BOARD_TARGET_CHIP) \
-                    -mfloat-abi=soft \
-
-
-GLOBAL_CFLAGS   += $(LOCAL_ENV_CFLAGS)
-
-GLOBAL_LDFLAGS         += \
-                   -Wl,--unresolved-symbols=report-all \
-                   -Wl,--warn-common \
-                   -Wl,--warn-section-align \
-                   -Xlinker \
-                   -Map=$(LISTING_DIRECTORY)/$(OUTPUT_FILENAME).map \
-                   -mthumb \
-                   -mabi=aapcs \
-                   -L $(TEMPLATE_PATH) \
-                   -T$(LINKER_SCRIPT) \
 
 GLOBAL_BINFLAGS  = -j .text -j .data
 
