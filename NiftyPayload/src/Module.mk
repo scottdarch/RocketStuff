@@ -28,80 +28,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# +---[NRF5 LIB UTIL]---------------------------------------------------------+
-LOCAL_MODULE_NAME := nrf_library_hal
-
-LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_DRV_PATH)/hal) \
-
-SDK_NRF5_LIB_INCLUDES_hal := $(LOCAL_INCLUDES)
-
-LOCAL_SRC_C := $(wildcard $(SDK_NRF5_DRV_PATH)/hal/*.c) \
-
-include $(COMMAND_MAKE_ARCHIVE)
-
-TMP_ARCHIVES := $(LOCAL_ARCHIVE)
-include $(COMMAND_RESET)
-
-
-# +---[NRF5 LIB BSP]----------------------------------------------------------+
-LOCAL_MODULE_NAME := nrf_library_bsp
-
-LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_EXAMPLES_PATH)/bsp) \
-
-SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
-
-LOCAL_SRC_C := $(wildcard $(SDK_NRF5_EXAMPLES_PATH)/bsp/*.c) \
-
-include $(COMMAND_MAKE_ARCHIVE)
-
-TMP_ARCHIVES += $(LOCAL_ARCHIVE)
-include $(COMMAND_RESET)
-
-
-# +---[NRF5 LIB UTIL]---------------------------------------------------------+
-LOCAL_MODULE_NAME := nrf_library_util
-
-LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/util) \
-
-SDK_NRF5_LIB_INCLUDES_util := $(LOCAL_INCLUDES)
-
-LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/util/*.c) \
-
-include $(COMMAND_MAKE_ARCHIVE)
-
-TMP_ARCHIVES += $(LOCAL_ARCHIVE)
-include $(COMMAND_RESET)
-
-
-# +---[NRF5 LIB BUTTON]-------------------------------------------------------+
-LOCAL_MODULE_NAME := nrf_library_button
-
-LOCAL_INCLUDES := $(call to_abs,$(SDK_NRF5_LIBS_PATH)/button) \
-
-SDK_NRF5_LIB_INCLUDES_button := $(LOCAL_INCLUDES)
-
-LOCAL_SRC_C := $(wildcard $(SDK_NRF5_LIBS_PATH)/button/*.c) \
-
-include $(COMMAND_MAKE_ARCHIVE)
-
-TMP_ARCHIVES += $(LOCAL_ARCHIVE)
-include $(COMMAND_RESET)
-
 
 # +---------------------------------------------------------------------------+
 
 LOCAL_MODULE_NAME := $(PROJECT_NAME)
 
-LOCAL_INCLUDES := $(SDK_NRF5_LIB_INCLUDES_hal) \
-                  $(SDK_NRF5_LIB_INCLUDES_util) \
-                  $(SDK_NRF5_LIB_INCLUDES_button) \
-                  $(LOCAL_DIR) \
+LOCAL_INCLUDES := $(LOCAL_DIR) \
                   $(LOCAL_DIR)/$(BOARD) \
+                  $(SDK_NRF5_TOOLCHAIN) \
+                  $(SDK_NRF5_EXAMPLES_PATH)/bsp \
+                  $(SDK_NRF5_COMPONENTS_PATH)/device \
+                  $(SDK_NRF5_DRV_PATH)/delay \
+                  $(SDK_NRF5_DRV_PATH)/hal \
 
-LOCAL_SRC_C     := $(LOCAL_DIR)/main.c \
-                   $(SDK_NRF5_TOOLCHAIN_GCC)/gcc_startup_$(BOARD_DEVICE).s \
+LOCAL_SRC_C    := $(LOCAL_DIR)/main.c \
+                  $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
+                  $(SDK_NRF5_TOOLCHAIN_GCC)/gcc_startup_$(BOARD_DEVICE).s \
+                  $(SDK_NRF5_DRV_PATH)/delay/nrf_delay.c \
 
-LOCAL_ARCHIVES  := $(TMP_ARCHIVES)
-LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_nrf51.ld
+LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
 
 include $(COMMAND_MAKE_BINARY)
