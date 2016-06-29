@@ -6,3 +6,7 @@
 	path = NiftyPayload/SDKs/nRF5_SDK_11.0.0_89a8197
 	url = git@github.com:scottdarch/SDKs.git
 	branch = nRF5_SDK_11.0.0_89a8197
+[submodule "NiftyPayload/SDKs/xdk-asf-3.31.0"]
+	path = NiftyPayload/SDKs/xdk-asf-3.31.0
+	url = git@github.com:scottdarch/SDKs
+	branch = xdk-asf-3.31.0
