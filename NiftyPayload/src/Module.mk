@@ -41,10 +41,10 @@ LOCAL_INCLUDES := $(LOCAL_DIR) \
                   $(SDK_NRF5_DRV_PATH)/delay \
                   $(SDK_NRF5_DRV_PATH)/hal \
 
-LOCAL_SRC_C    := $(LOCAL_DIR)/main.c \
-                  $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
-                  $(SDK_NRF5_TOOLCHAIN_GCC)/gcc_startup_$(BOARD_DEVICE).s \
+LOCAL_SRC_C    := $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
+                  $(LOCAL_DIR)/main.c \
                   $(SDK_NRF5_DRV_PATH)/delay/nrf_delay.c \
+                  $(LOCAL_DIR)/gcc_startup_$(BOARD_DEVICE).s \
 
 LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
 
