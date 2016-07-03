@@ -28,44 +28,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-PROJECT_NAME        := NiftyPayload
-BUILD_SUPPORT_DIR   := Tinker/tbuild
-ROOT_DIR            := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SDKS_DIR            := SDKs
 
-# +----------------------------------------------------------------------------+
-# | DEFAULTS
-# +----------------------------------------------------------------------------+
-ifeq ($(TBOARD),)
-$(error TBOARD was not defined!)
-endif
+# +---------------------------------------------------------------------------+
 
-LOCAL_ENV_BOARD      := $(TBOARD)
-LOCAL_ENV_BOARDS_DIR := boards
+LOCAL_MODULE_NAME := blue_blinky
 
-# +----------------------------------------------------------------------------+
-include $(BUILD_SUPPORT_DIR)/Common.mk
+LOCAL_INCLUDES := $(LOCAL_DIR) \
+                  $(LOCAL_DIR)/$(LOCAL_ENV_BOARDS_DIR)/$(BOARD) \
+                  $(SDK_NRF5_TOOLCHAIN) \
+                  $(SDK_NRF5_EXAMPLES_PATH)/bsp \
+                  $(SDK_NRF5_COMPONENTS_PATH)/device \
+                  $(SDK_NRF5_DRV_PATH)/delay \
+                  $(SDK_NRF5_DRV_PATH)/hal \
 
-AVR_FIRMWARES := firmware/tiny_blink \
+LOCAL_SRC_C    := $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
+                  $(LOCAL_DIR)/main.c \
+                  $(SDK_NRF5_DRV_PATH)/delay/nrf_delay.c \
+                  $(LOCAL_DIR)/gcc_startup_$(BOARD_DEVICE).s \
 
-ARM_FIRMWARES := firmware/blue_blinky \
-                 firmware/sam_ser \
+LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
 
-# +----------------------------------------------------------------------------+
-# | MODULES
-# +----------------------------------------------------------------------------+
-ifeq ($(BOARD_TOOLCHAIN),avr-gcc)
-MODULE_DIR := firmware/tiny_blink
-include $(COMMAND_MAKE_MODULE)
-else
-MODULE_DIR := firmware/blue_blinky
-include $(COMMAND_MAKE_MODULE)
-
-#MODULE_DIR := firmware/sam_ser
-#include $(COMMAND_MAKE_MODULE)
-endif
-
-# +----------------------------------------------------------------------------+
-
-include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
-
+include $(COMMAND_MAKE_BINARY)

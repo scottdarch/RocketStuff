@@ -28,44 +28,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-PROJECT_NAME        := NiftyPayload
-BUILD_SUPPORT_DIR   := Tinker/tbuild
-ROOT_DIR            := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SDKS_DIR            := SDKs
 
-# +----------------------------------------------------------------------------+
-# | DEFAULTS
-# +----------------------------------------------------------------------------+
-ifeq ($(TBOARD),)
-$(error TBOARD was not defined!)
-endif
+# +---------------------------------------------------------------------------+
 
-LOCAL_ENV_BOARD      := $(TBOARD)
-LOCAL_ENV_BOARDS_DIR := boards
+LOCAL_MODULE_NAME := sam_ser
 
-# +----------------------------------------------------------------------------+
-include $(BUILD_SUPPORT_DIR)/Common.mk
+LOCAL_INCLUDES := $(LOCAL_DIR) \
+                  
+LOCAL_SRC_C    := $(SDK_ASF_SOURCE) \
+                  $(LOCAL_DIR)/main.c \
 
-AVR_FIRMWARES := firmware/tiny_blink \
+$(eval $(call local_add_and_include_c_at, $(SDK_ASF_DRIVER_PATH)/port))
+$(eval $(call local_add_and_include_c_at, $(SDK_ASF_DRIVER_PATH)/sercom))
+$(eval $(call local_add_and_include_c_at, $(SDK_ASF_DRIVER_PATH)/sercom/usart))
 
-ARM_FIRMWARES := firmware/blue_blinky \
-                 firmware/sam_ser \
-
-# +----------------------------------------------------------------------------+
-# | MODULES
-# +----------------------------------------------------------------------------+
-ifeq ($(BOARD_TOOLCHAIN),avr-gcc)
-MODULE_DIR := firmware/tiny_blink
-include $(COMMAND_MAKE_MODULE)
-else
-MODULE_DIR := firmware/blue_blinky
-include $(COMMAND_MAKE_MODULE)
-
-#MODULE_DIR := firmware/sam_ser
-#include $(COMMAND_MAKE_MODULE)
-endif
-
-# +----------------------------------------------------------------------------+
-
-include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
-
+include $(COMMAND_MAKE_BINARY)

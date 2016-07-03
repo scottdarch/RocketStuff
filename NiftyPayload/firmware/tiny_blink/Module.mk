@@ -31,21 +31,16 @@
 
 # +---------------------------------------------------------------------------+
 
-LOCAL_MODULE_NAME := $(PROJECT_NAME)
+LOCAL_MODULE_NAME := tiny_blink
 
 LOCAL_INCLUDES := $(LOCAL_DIR) \
-                  $(LOCAL_DIR)/$(BOARD) \
+                  $(ROOT_DIR)/$(LOCAL_ENV_BOARDS_DIR)/$(BOARD) \
                   $(SDK_NRF5_TOOLCHAIN) \
                   $(SDK_NRF5_EXAMPLES_PATH)/bsp \
                   $(SDK_NRF5_COMPONENTS_PATH)/device \
                   $(SDK_NRF5_DRV_PATH)/delay \
                   $(SDK_NRF5_DRV_PATH)/hal \
 
-LOCAL_SRC_C    := $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
-                  $(LOCAL_DIR)/main.c \
-                  $(SDK_NRF5_DRV_PATH)/delay/nrf_delay.c \
-                  $(LOCAL_DIR)/gcc_startup_$(BOARD_DEVICE).s \
-
-LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
+LOCAL_SRC_C    := $(LOCAL_DIR)/main.c \
 
 include $(COMMAND_MAKE_BINARY)

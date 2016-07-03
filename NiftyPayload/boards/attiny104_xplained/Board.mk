@@ -27,45 +27,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-PROJECT_NAME        := NiftyPayload
-BUILD_SUPPORT_DIR   := Tinker/tbuild
-ROOT_DIR            := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SDKS_DIR            := SDKs
 
-# +----------------------------------------------------------------------------+
-# | DEFAULTS
-# +----------------------------------------------------------------------------+
-ifeq ($(TBOARD),)
-$(error TBOARD was not defined!)
-endif
+# Nordic's V1 dev board for the nRF52 SDK.
+include $(COMMON_BOARDS_DIR)/Attiny.mk
 
-LOCAL_ENV_BOARD      := $(TBOARD)
-LOCAL_ENV_BOARDS_DIR := boards
-
-# +----------------------------------------------------------------------------+
-include $(BUILD_SUPPORT_DIR)/Common.mk
-
-AVR_FIRMWARES := firmware/tiny_blink \
-
-ARM_FIRMWARES := firmware/blue_blinky \
-                 firmware/sam_ser \
-
-# +----------------------------------------------------------------------------+
-# | MODULES
-# +----------------------------------------------------------------------------+
-ifeq ($(BOARD_TOOLCHAIN),avr-gcc)
-MODULE_DIR := firmware/tiny_blink
-include $(COMMAND_MAKE_MODULE)
-else
-MODULE_DIR := firmware/blue_blinky
-include $(COMMAND_MAKE_MODULE)
-
-#MODULE_DIR := firmware/sam_ser
-#include $(COMMAND_MAKE_MODULE)
-endif
-
-# +----------------------------------------------------------------------------+
-
-include $(BUILD_SUPPORT_DIR)/CommonTargets.mk
-
+BOARD                         := attiny104_xplained
+BOARD_MCU                     := attiny13
+BOARD_MCU_CLK                 := 8000000UL
