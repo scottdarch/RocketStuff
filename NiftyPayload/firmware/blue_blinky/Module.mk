@@ -38,13 +38,19 @@ LOCAL_INCLUDES := $(LOCAL_DIR) \
                   $(SDK_NRF5_TOOLCHAIN) \
                   $(SDK_NRF5_EXAMPLES_PATH)/bsp \
                   $(SDK_NRF5_COMPONENTS_PATH)/device \
-                  $(SDK_NRF5_DRV_PATH)/delay \
                   $(SDK_NRF5_DRV_PATH)/hal \
+                  $(SDK_NRF5_DRV_PATH)/
 
-LOCAL_SRC_C    := $(SDK_NRF5_TOOLCHAIN)/system_$(BOARD_DEVICE).c \
+LOCAL_SRC_C    := $(SDK_NRF5_COMMON_SRC) \
                   $(LOCAL_DIR)/main.c \
-                  $(SDK_NRF5_DRV_PATH)/delay/nrf_delay.c \
                   $(LOCAL_DIR)/gcc_startup_$(BOARD_DEVICE).s \
+
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/common))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/uart))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/uart))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/delay))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/util))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/fifo))
 
 LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
 
