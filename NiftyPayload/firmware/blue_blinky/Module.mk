@@ -47,11 +47,16 @@ LOCAL_SRC_C    := $(SDK_NRF5_COMMON_SRC) \
 
 $(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/common))
 $(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/uart))
-$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/uart))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/uart, %/app_uart.c))
 $(eval $(call local_add_and_include_c_at, $(SDK_NRF5_DRV_PATH)/delay))
-$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/util))
+$(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/util, %/nrf_log.c))
 $(eval $(call local_add_and_include_c_at, $(SDK_NRF5_LIBS_PATH)/fifo))
 
 LOCAL_LINKER_SCRIPT := $(LOCAL_DIR)/blinky_gcc_$(BOARD_DEVICE).ld
+
+LOCAL_CFLAGS += -DBSP_DEFINES_ONLY \
+                -DBSP_UART_SUPPORT \
+
+LOCAL_LIBS += m \
 
 include $(COMMAND_MAKE_BINARY)
