@@ -29,8 +29,8 @@
 # SOFTWARE.
 
 # Nordic's V1 dev board for the nRF52 SDK.
-include $(COMMON_BOARDS_DIR)/Attiny.mk
+include $(COMMON_BOARDS_DIR)/Atmega.mk
 
-BOARD                         := attiny104_xplained
-BOARD_MCU                     := attiny13
+BOARD                         := atmega328p_xplained_mini
+BOARD_MCU                     := atmega320p
 BOARD_MCU_CLK                 := 8000000UL

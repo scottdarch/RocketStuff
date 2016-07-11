@@ -3,8 +3,8 @@ Language:        Cpp
 # BasedOnStyle:  LLVM
 AccessModifierOffset: -2
 AlignAfterOpenBracket: true
-AlignConsecutiveAssignments: false
-AlignEscapedNewlinesLeft: false
+AlignConsecutiveAssignments: true
+AlignEscapedNewlinesLeft: true
 AlignOperands:   true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
