@@ -1,4 +1,4 @@
-#  NifyPayload (by 32bits.io)
+#  Nify (by 32bits.io)
 #                                                                       .
 #                                                                      /
 #
@@ -28,7 +28,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Nordic's V1 dev board for the nRF52 SDK.
 include $(COMMON_BOARDS_DIR)/Atmega.mk
 
 BOARD                         := atmega328p_xplained_mini

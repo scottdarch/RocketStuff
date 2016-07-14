@@ -1,4 +1,4 @@
-#  NifyPayload (by 32bits.io)
+#  Nify (by 32bits.io)
 #                                                                       .
 #                                                                      /
 #

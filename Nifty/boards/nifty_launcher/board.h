@@ -1,4 +1,4 @@
-/*  Nifty (by 32bits.io)
+/*  NiftyPayload (by 32bits.io)
  *                                                                       .
  *                                                                      /
  *
@@ -28,5 +28,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include <assert.h>
-#include "board.h"
+#pragma once
+
+#include "board_def.h"

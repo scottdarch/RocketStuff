@@ -1,4 +1,4 @@
-#  NifyPayload (by 32bits.io)
+#  Nify (by 32bits.io)
 #                                                                       .
 #                                                                      /
 #
@@ -31,15 +31,9 @@
 
 # +---------------------------------------------------------------------------+
 
-LOCAL_MODULE_NAME := tiny_blink
+LOCAL_MODULE_NAME := NiftyLauncher
 
 LOCAL_INCLUDES := $(LOCAL_DIR) \
-                  $(ROOT_DIR)/$(LOCAL_ENV_BOARDS_DIR)/$(BOARD) \
-                  $(SDK_NRF5_TOOLCHAIN) \
-                  $(SDK_NRF5_EXAMPLES_PATH)/bsp \
-                  $(SDK_NRF5_COMPONENTS_PATH)/device \
-                  $(SDK_NRF5_DRV_PATH)/delay \
-                  $(SDK_NRF5_DRV_PATH)/hal \
 
 LOCAL_SRC_C    := $(LOCAL_DIR)/main.c \
 

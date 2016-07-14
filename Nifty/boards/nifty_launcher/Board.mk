@@ -27,27 +27,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-export PROJECT_NAME        := Nifty
-export BUILD_SUPPORT_DIR   := Tinker/tbuild
-export ROOT_DIR            := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export SDKS_DIR            := SDKs
-export LOCAL_ENV_BOARDS_DIR := boards
 
-AVR_MODULES := firmware/launcher \
+include $(COMMON_BOARDS_DIR)/Atmega.mk
 
-BLE_MODULES := firmware/blue_blinky \
-
-SUBMAKE_FLAGS := -r -R
-
-.PHONY: all all-avr all-ble
-
-all: all-ble all-avr ;
-
-all-avr: | $(AVR_MODULES)
-	LOCAL_ENV_BOARD=nifty_launcher MODULES="$|" $(MAKE) $(SUBMAKE_FLAGS) --makefile=$(BUILD_SUPPORT_DIR)/MakeBoard.mk
-	
-all-ble: | $(BLE_MODULES) 
-	LOCAL_ENV_BOARD=np_v1 MODULES="$|" $(MAKE) $(SUBMAKE_FLAGS) --makefile=$(BUILD_SUPPORT_DIR)/MakeBoard.mk
-
-
+BOARD                         := atmega328p_xplained_mini
+BOARD_MCU                     := atmega320p
+BOARD_MCU_CLK                 := 8000000UL
