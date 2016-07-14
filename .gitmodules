@@ -1,12 +1,12 @@
 [submodule "NiftyPayload/Tinker"]
-	path = NiftyPayload/Tinker
-	url = git@github.com:scottdarch/TInker.git
+	path = Nifty/Tinker
+	url = git@github.com:scottdarch/Tinker.git
 	branch = develop
 [submodule "NiftyPayload/SDKs/nRF5_SDK_11.0.0_89a8197"]
-	path = NiftyPayload/SDKs/nRF5_SDK_11.0.0_89a8197
+	path = Nifty/SDKs/nRF5_SDK_11.0.0_89a8197
 	url = git@github.com:scottdarch/SDKs.git
 	branch = nRF5_SDK_11.0.0_89a8197
 [submodule "NiftyPayload/SDKs/xdk-asf-3.31.0"]
-	path = NiftyPayload/SDKs/xdk-asf-3.31.0
+	path = Nifty/SDKs/xdk-asf-3.31.0
 	url = git@github.com:scottdarch/SDKs
 	branch = xdk-asf-3.31.0
