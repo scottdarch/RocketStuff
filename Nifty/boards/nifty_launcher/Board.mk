@@ -30,6 +30,10 @@
 
 include $(COMMON_BOARDS_DIR)/Atmega.mk
 
-BOARD                         := atmega328p_xplained_mini
-BOARD_MCU                     := atmega320p
+BOARD                         := nifty_launcher_v1
+BOARD_MCU                     := atmega328p
 BOARD_MCU_CLK                 := 8000000UL
+BOARD_SDKS                    := asf
+
+GLOBAL_CFLAGS += -D__AVR_ATmega328P__ \
+

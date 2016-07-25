@@ -23,7 +23,31 @@
 #include <avr/interrupt.h>
 #include "board.h"
 
-int main(void)
+// From module: CPU specific features
+#include <mega_reset_cause.h>
+
+// From module: IOPORT - General purpose I/O service
+#include <ioport.h>
+
+// From module: Interrupt management - megaAVR and tinyAVR implementation
+#include <interrupt.h>
+
+// From module: MEGA compiler driver
+#include <compiler.h>
+#include <status_codes.h>
+
+// From module: Part identification macros
+#include <parts.h>
+
+// From module: System Clock Control - MEGA RF A1 implementation
+#include <sysclk.h>
+
+// From module: USART - Universal Synchronous/Asynchronous Receiver/Transmitter
+#include <usart_megarf.h>
+
+// +---------------------------------------------------------------------------+
+int main()
 {
-    cli();
+    init_board();
+    sysclk_init();
 }

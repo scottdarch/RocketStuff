@@ -30,3 +30,8 @@
  */
 #include <assert.h>
 #include "board.h"
+
+void init_board()
+{
+    AVR_IO_INIT_PIN(LAUNCH_BUTT);
+}

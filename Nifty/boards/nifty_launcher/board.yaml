@@ -1,0 +1,7 @@
+gpio :
+  - LAUNCH_BUTT : 
+      COMMENT : Button input used to initiate launch sequence.
+      PORT : B
+      BIT : 2
+      ENABLE_PULLUP : 1
+      

@@ -28,26 +28,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-export PROJECT_NAME        := Nifty
-export BUILD_SUPPORT_DIR   := Tinker/tbuild
-export ROOT_DIR            := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export SDKS_DIR            := SDKs
-export LOCAL_ENV_BOARDS_DIR := boards
+PROJECT_NAME        	:= Nifty
+BUILD_SUPPORT_DIR   	:= Tinker/tbuild
+ROOT_DIR            	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+SDKS_DIR            	:= SDKs
+LOCAL_ENV_BOARDS_DIR 	:= boards
 
-AVR_MODULES := firmware/launcher \
+LOCAL_ENV_BOARD=nifty_launcher
+MODULES := firmware/launcher
 
-BLE_MODULES := firmware/blue_blinky \
-
-SUBMAKE_FLAGS := -r -R
-
-.PHONY: all all-avr all-ble
-
-all: all-ble all-avr ;
-
-all-avr: | $(AVR_MODULES)
-	LOCAL_ENV_BOARD=nifty_launcher MODULES="$|" $(MAKE) $(SUBMAKE_FLAGS) --makefile=$(BUILD_SUPPORT_DIR)/MakeBoard.mk
-	
-all-ble: | $(BLE_MODULES) 
-	LOCAL_ENV_BOARD=np_v1 MODULES="$|" $(MAKE) $(SUBMAKE_FLAGS) --makefile=$(BUILD_SUPPORT_DIR)/MakeBoard.mk
+include $(BUILD_SUPPORT_DIR)/MakeBoard.mk
 
 
+#MODULES := firmware/blue_blinky
+#LOCAL_ENV_BOARD=nifty_launcher
+
+#include $(BUILD_SUPPORT_DIR)/MakeBoard.mk

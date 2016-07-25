@@ -34,7 +34,14 @@
 LOCAL_MODULE_NAME := NiftyLauncher
 
 LOCAL_INCLUDES := $(LOCAL_DIR) \
+                  $(LOCAL_DIR)/../../boards/$(LOCAL_ENV_BOARD) \
 
 LOCAL_SRC_C    := $(LOCAL_DIR)/main.c \
+                  $(LOCAL_DIR)/../../boards/$(LOCAL_ENV_BOARD)/board.c \
+
+$(eval $(call asf_add_driver, cpu))
+$(eval $(call asf_add_driver, usart))
+$(eval $(call asf_add_service, clock))
+$(eval $(call asf_add_service, ioport))
 
 include $(COMMAND_MAKE_BINARY)
