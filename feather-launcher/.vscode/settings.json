@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.env.osx": {
+        "PATH": "/Users/dixonsco/.platformio/penv/bin:/Users/dixonsco/.platformio/penv:/Library/Frameworks/Python.framework/Versions/2.7/bin:/apollo/env/SDETools/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/CrossPack-AVR/bin:/Library/TeX/texbin:/Applications/Wireshark.app/Contents/MacOS:/Users/dixonsco/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/local/texlive/2016/bin/x86_64-darwin:/apollo/env/SDETools/bin::/Users/dixonsco/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin::/apollo/env/SDETools/bin:/opt/local/bin:/opt/local/sbin:/Applications/coverity/bin",
+        "PLATFORMIO_CALLER": "vscode"
+    },
+}
